@@ -348,9 +348,11 @@ async def initialize_sample_data():
     # Create sample checked-in customers
     sample_customers = [
         Customer(name="John Doe", email="john@example.com", phone="111-222-3333", 
-                current_room="102", check_in_date=date.today(), check_out_date=date(2025, 7, 15)),
+                current_room="102", check_in_date=date.today(), check_out_date=date(2025, 7, 15),
+                advance_amount=200.0, notes="VIP guest", room_charges=500.0, total_amount=300.0),
         Customer(name="Jane Wilson", email="jane@example.com", phone="444-555-6666", 
-                current_room="205", check_in_date=date(2025, 7, 10), check_out_date=date(2025, 7, 14)),
+                current_room="205", check_in_date=date(2025, 7, 10), check_out_date=date(2025, 7, 14),
+                advance_amount=150.0, notes="Early check-in requested", room_charges=750.0, total_amount=600.0),
     ]
     
     for customer in sample_customers:
