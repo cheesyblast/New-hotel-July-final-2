@@ -159,18 +159,21 @@ async def create_customer(customer: Customer):
 
 @api_router.post("/checkout")
 async def checkout_customer(checkout: CheckoutRequest):
+    # Find customer first to get room info
+    customer = await db.customers.find_one({"id": checkout.customer_id})
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    
     # Remove customer from checked-in list
     result = await db.customers.delete_one({"id": checkout.customer_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Customer not found")
     
     # Update room status to available
-    customer = await db.customers.find_one({"id": checkout.customer_id})
-    if customer:
-        await db.rooms.update_one(
-            {"room_number": customer["current_room"]},
-            {"$set": {"status": "Available", "current_guest": None, "check_in_date": None, "check_out_date": None}}
-        )
+    await db.rooms.update_one(
+        {"room_number": customer["current_room"]},
+        {"$set": {"status": "Available", "current_guest": None, "check_in_date": None, "check_out_date": None}}
+    )
     
     return {"message": "Customer checked out successfully"}
 
