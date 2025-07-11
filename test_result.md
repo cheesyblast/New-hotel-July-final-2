@@ -339,6 +339,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Financial Reports Integration with Daily Sales"
     - "Enhanced Checkout with Payment Methods and Daily Sales"
     - "Enhanced Checkout Modal UI"
   stuck_tasks: []
