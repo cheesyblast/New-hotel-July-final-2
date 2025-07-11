@@ -795,7 +795,7 @@ async def get_month_comparison():
             "revenue_change": calculate_change(current_month_data["revenue"], last_month_data["revenue"]),
             "expenses_change": calculate_change(current_month_data["expenses"], last_month_data["expenses"]),
             "profit_change": calculate_change(current_month_data["profit"], last_month_data["profit"]),
-            "bookings_change": calculate_change(current_month_data["bookings_count"], last_month_data["bookings_count"])
+            "sales_change": calculate_change(current_month_data["sales_count"], last_month_data["sales_count"])
         }
     }
     
