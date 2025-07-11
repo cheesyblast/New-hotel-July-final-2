@@ -195,9 +195,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Hotel Management API - Room Management"
-    - "Hotel Management API - Booking Management"
-    - "Hotel Management API - Customer Management and Checkout"
+    - "Hotel Dashboard - Room Status Quick View"
+    - "Hotel Dashboard - Upcoming Bookings Section"
+    - "Hotel Dashboard - Checked-in Customers with Checkout"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
