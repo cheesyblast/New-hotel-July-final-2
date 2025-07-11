@@ -431,6 +431,23 @@ async def initialize_sample_data():
         customer_dict['check_out_date'] = datetime.combine(customer_dict['check_out_date'], datetime.min.time())
         await db.customers.insert_one(customer_dict)
     
+    # Create sample expenses
+    sample_expenses = [
+        Expense(description="Monthly electricity bill", amount=1500.0, category="Utilities", expense_date=date(2025, 7, 5)),
+        Expense(description="Housekeeping supplies", amount=800.0, category="Maintenance", expense_date=date(2025, 7, 8)),
+        Expense(description="Staff salaries", amount=25000.0, category="Staff", expense_date=date(2025, 7, 1)),
+        Expense(description="Food and beverages", amount=3500.0, category="Food", expense_date=date(2025, 7, 10)),
+        Expense(description="Marketing campaign", amount=2000.0, category="Marketing", expense_date=date(2025, 7, 6)),
+        Expense(description="Internet and phone bills", amount=500.0, category="Utilities", expense_date=date(2025, 7, 7)),
+        Expense(description="Room maintenance", amount=1200.0, category="Maintenance", expense_date=date(2025, 7, 9)),
+    ]
+    
+    for expense in sample_expenses:
+        expense_dict = expense.dict()
+        # Convert date to datetime for MongoDB compatibility
+        expense_dict['expense_date'] = datetime.combine(expense_dict['expense_date'], datetime.min.time())
+        await db.expenses.insert_one(expense_dict)
+    
     return {"message": "Sample data initialized successfully"}
 
 # Guest Management Routes
