@@ -681,6 +681,316 @@ const Dashboard = () => {
   );
 };
 
+// Expenses Component
+const Expenses = () => {
+  const [expenses, setExpenses] = useState([]);
+  const [financialSummary, setFinancialSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
+  const [expenseData, setExpenseData] = useState({
+    description: '',
+    amount: 0,
+    category: '',
+    expense_date: ''
+  });
+
+  const expenseCategories = [
+    'Utilities',
+    'Maintenance', 
+    'Staff',
+    'Food',
+    'Marketing',
+    'Supplies',
+    'Insurance',
+    'Other'
+  ];
+
+  useEffect(() => {
+    fetchExpenses();
+    fetchFinancialSummary();
+  }, []);
+
+  const fetchExpenses = async () => {
+    try {
+      const response = await axios.get(`${API}/expenses`);
+      setExpenses(response.data);
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+    }
+  };
+
+  const fetchFinancialSummary = async () => {
+    try {
+      const response = await axios.get(`${API}/financial-summary`);
+      setFinancialSummary(response.data);
+    } catch (error) {
+      console.error('Error fetching financial summary:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddExpense = async () => {
+    try {
+      if (!expenseData.description || !expenseData.amount || !expenseData.category || !expenseData.expense_date) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      await axios.post(`${API}/expenses`, expenseData);
+      
+      setShowAddExpenseModal(false);
+      setExpenseData({
+        description: '',
+        amount: 0,
+        category: '',
+        expense_date: ''
+      });
+      
+      // Refresh data after adding expense
+      await fetchExpenses();
+      await fetchFinancialSummary();
+      alert('Expense added successfully!');
+    } catch (error) {
+      console.error('Error adding expense:', error);
+      alert('Error adding expense. Please try again.');
+    }
+  };
+
+  const handleDeleteExpense = async (expenseId) => {
+    if (window.confirm('Are you sure you want to delete this expense?')) {
+      try {
+        await axios.delete(`${API}/expenses/${expenseId}`);
+        await fetchExpenses();
+        await fetchFinancialSummary();
+      } catch (error) {
+        console.error('Error deleting expense:', error);
+        alert('Error deleting expense. Please try again.');
+      }
+    }
+  };
+
+  const getCategoryColor = (category) => {
+    const colors = {
+      'Utilities': 'bg-blue-100 text-blue-800',
+      'Maintenance': 'bg-orange-100 text-orange-800',
+      'Staff': 'bg-green-100 text-green-800',
+      'Food': 'bg-purple-100 text-purple-800',
+      'Marketing': 'bg-pink-100 text-pink-800',
+      'Supplies': 'bg-yellow-100 text-yellow-800',
+      'Insurance': 'bg-indigo-100 text-indigo-800',
+      'Other': 'bg-gray-100 text-gray-800'
+    };
+    return colors[category] || 'bg-gray-100 text-gray-800';
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Expenses & Profit Management</h2>
+          <p className="text-gray-600">Track expenses and monitor financial performance</p>
+        </div>
+        <button 
+          onClick={() => setShowAddExpenseModal(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center space-x-2"
+        >
+          <span>+</span>
+          <span>Add Expense</span>
+        </button>
+      </div>
+
+      {/* Financial Summary Cards */}
+      {financialSummary && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-green-800 mb-2">Total Revenue</h3>
+            <p className="text-3xl font-bold text-green-900">${financialSummary.total_revenue.toFixed(2)}</p>
+            <p className="text-sm text-green-600">Current period</p>
+          </div>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-red-800 mb-2">Total Expenses</h3>
+            <p className="text-3xl font-bold text-red-900">${financialSummary.total_expenses.toFixed(2)}</p>
+            <p className="text-sm text-red-600">Current period</p>
+          </div>
+          <div className={`${financialSummary.net_profit >= 0 ? 'bg-blue-50 border-blue-200' : 'bg-orange-50 border-orange-200'} border rounded-lg p-6`}>
+            <h3 className={`text-lg font-semibold ${financialSummary.net_profit >= 0 ? 'text-blue-800' : 'text-orange-800'} mb-2`}>
+              Net {financialSummary.net_profit >= 0 ? 'Profit' : 'Loss'}
+            </h3>
+            <p className={`text-3xl font-bold ${financialSummary.net_profit >= 0 ? 'text-blue-900' : 'text-orange-900'}`}>
+              ${Math.abs(financialSummary.net_profit).toFixed(2)}
+            </p>
+            <p className={`text-sm ${financialSummary.net_profit >= 0 ? 'text-blue-600' : 'text-orange-600'}`}>
+              Current period
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Expenses Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">Expense Records</h3>
+        </div>
+        {expenses.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">
+            No expenses recorded
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Description
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Created By
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {expenses.map((expense) => (
+                  <tr key={expense.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{expense.description}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-bold text-red-600">${expense.amount.toFixed(2)}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getCategoryColor(expense.category)}`}>
+                        {expense.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{expense.expense_date}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{expense.created_by}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
+                        onClick={() => handleDeleteExpense(expense.id)}
+                        className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Add Expense Modal */}
+      {showAddExpenseModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Add New Expense</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description *
+                </label>
+                <input
+                  type="text"
+                  value={expenseData.description}
+                  onChange={(e) => setExpenseData({...expenseData, description: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter expense description"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Amount *
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={expenseData.amount}
+                  onChange={(e) => setExpenseData({...expenseData, amount: parseFloat(e.target.value) || 0})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="0.00"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Category *
+                </label>
+                <select
+                  value={expenseData.category}
+                  onChange={(e) => setExpenseData({...expenseData, category: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select category</option>
+                  {expenseCategories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Date *
+                </label>
+                <input
+                  type="date"
+                  value={expenseData.expense_date}
+                  onChange={(e) => setExpenseData({...expenseData, expense_date: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowAddExpenseModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddExpense}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Add Expense
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Guests Component
 const Guests = () => {
   const [guests, setGuests] = useState([]);
