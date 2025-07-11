@@ -147,8 +147,11 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
+      - working: true
+        agent: "testing"
+        comment: "PASSED - Customer management and checkout fully functional. POST /api/checkin processes check-ins with advance payments and notes correctly. GET /api/customers/checked-in returns checked-in customers with complete details. POST /api/checkout handles billing calculations properly (room charges, advance payments, additional charges, total amounts). Room status updates correctly during check-in/checkout process."
       - working: true
         agent: "testing"
         comment: "2 checked-in customers managed correctly, checkout functionality removes customers and updates room status perfectly."
