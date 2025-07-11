@@ -217,6 +217,18 @@ backend:
         comment: "Implemented profit/loss calculations with revenue from bookings and expense tracking by category."
 
 frontend:
+  - task: "Enhanced Checkout Modal UI"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Updated checkout modal to remove default zeros from amount fields, added payment method selection (Cash/Card/Bank Transfer), made modal wider (max-w-lg), and enhanced real-time balance calculation."
+
   - task: "Hotel Dashboard - Room Status Quick View"
     implemented: true
     working: "NA"
