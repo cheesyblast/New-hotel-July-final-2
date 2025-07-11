@@ -444,15 +444,15 @@ async def initialize_sample_data():
         Booking(guest_name="Alice Johnson", guest_email="alice@example.com", guest_phone="123-456-7890", 
                 guest_id_passport="P123456789", guest_country="USA",
                 room_number="103", check_in_date=date(2025, 7, 16), check_out_date=date(2025, 7, 20), 
-                stay_type="Night Stay", status="Upcoming", additional_notes="Early check-in requested"),
+                stay_type="Night Stay", booking_amount=2000.0, status="Upcoming", additional_notes="Early check-in requested"),
         Booking(guest_name="Bob Smith", guest_email="bob@example.com", guest_phone="098-765-4321", 
                 guest_id_passport="P987654321", guest_country="Canada",
                 room_number="201", check_in_date=date(2025, 7, 18), check_out_date=date(2025, 7, 22), 
-                stay_type="Night Stay", status="Upcoming", additional_notes="Business traveler"),
+                stay_type="Night Stay", booking_amount=1800.0, status="Upcoming", additional_notes="Business traveler"),
         Booking(guest_name="Carol Davis", guest_email="carol@example.com", guest_phone="555-123-4567", 
                 guest_id_passport="P555444333", guest_country="UK",
                 room_number="301", check_in_date=date(2025, 7, 20), check_out_date=date(2025, 7, 25), 
-                stay_type="Night Stay", status="Upcoming", additional_notes="Celebrating anniversary"),
+                stay_type="Night Stay", booking_amount=2500.0, status="Upcoming", additional_notes="Celebrating anniversary"),
     ]
     
     for booking in sample_bookings:
