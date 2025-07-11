@@ -842,6 +842,32 @@ async def delete_expense(expense_id: str):
         raise HTTPException(status_code=404, detail="Expense not found")
     return {"message": "Expense deleted successfully"}
 
+@api_router.get("/daily-sales")
+async def get_daily_sales(start_date: Optional[str] = None, end_date: Optional[str] = None):
+    # Default to current month if no dates provided
+    if not start_date or not end_date:
+        today = datetime.now().date()
+        start_date_obj = today.replace(day=1)
+        end_date_obj = today
+    else:
+        start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+    
+    # Convert dates to datetime for MongoDB query
+    start_datetime = datetime.combine(start_date_obj, datetime.min.time())
+    end_datetime = datetime.combine(end_date_obj, datetime.max.time())
+    
+    daily_sales = await db.daily_sales.find({
+        "date": {"$gte": start_datetime, "$lte": end_datetime}
+    }).sort("date", -1).to_list(1000)
+    
+    # Convert datetime back to date for response
+    for sale in daily_sales:
+        if isinstance(sale.get('date'), datetime):
+            sale['date'] = sale['date'].date()
+    
+    return [DailySale(**sale) for sale in daily_sales]
+
 @api_router.get("/financial-summary")
 async def get_financial_summary(start_date: Optional[str] = None, end_date: Optional[str] = None):
     # Default to current month if no dates provided
