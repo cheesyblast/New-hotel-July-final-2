@@ -321,7 +321,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All Frontend Components"
+    - "Enhanced Checkout with Payment Methods and Daily Sales"
+    - "Enhanced Checkout Modal UI"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
