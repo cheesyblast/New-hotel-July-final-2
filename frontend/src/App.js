@@ -179,17 +179,22 @@ const Dashboard = () => {
 
   const handleNewBooking = async () => {
     try {
-      // Validate required fields - checkout date not required for short time
-      const requiredFields = ['guest_name', 'guest_email', 'guest_phone', 'room_number', 'check_in_date'];
+      // Validate required fields - only name, room, check-in date, and booking amount are required
+      const requiredFields = ['guest_name', 'room_number', 'check_in_date'];
       const missingFields = requiredFields.filter(field => !newBookingData[field]);
       
       // For night stay, checkout date is required
       if (newBookingData.stay_type === 'Night Stay' && !newBookingData.check_out_date) {
         missingFields.push('check_out_date');
       }
+
+      // Booking amount is required
+      if (!newBookingData.booking_amount || newBookingData.booking_amount <= 0) {
+        missingFields.push('booking_amount');
+      }
       
       if (missingFields.length > 0) {
-        alert('Please fill in all required fields');
+        alert('Please fill in all required fields (Name, Room, Dates, and Booking Amount)');
         return;
       }
 
@@ -216,6 +221,7 @@ const Dashboard = () => {
         check_in_date: '',
         check_out_date: '',
         stay_type: 'Night Stay',
+        booking_amount: 0,
         additional_notes: ''
       });
       
