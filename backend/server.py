@@ -691,17 +691,14 @@ async def get_monthly_reports(year: Optional[int] = None):
         else:
             end_date = datetime(year, month + 1, 1) - timedelta(days=1)
         
-        # Calculate monthly revenue
+        # Calculate monthly revenue from actual daily sales (payment collected)
         monthly_revenue = 0
-        completed_bookings = await db.bookings.find({
-            "status": "Completed",
-            "check_out_date": {"$gte": start_date, "$lte": end_date}
+        daily_sales = await db.daily_sales.find({
+            "date": {"$gte": start_date, "$lte": end_date}
         }).to_list(1000)
         
-        for booking in completed_bookings:
-            room = await db.rooms.find_one({"room_number": booking.get("room_number")})
-            if room:
-                monthly_revenue += room.get("price_per_night", 500)
+        for sale in daily_sales:
+            monthly_revenue += sale.get("total_amount", 0)
         
         # Calculate monthly expenses
         monthly_expenses = 0
@@ -714,8 +711,13 @@ async def get_monthly_reports(year: Optional[int] = None):
         
         monthly_profit = monthly_revenue - monthly_expenses
         
-        # Calculate occupancy rate
+        # Calculate occupancy rate based on bookings
         total_rooms = await db.rooms.count_documents({})
+        completed_bookings = await db.bookings.find({
+            "status": "Completed",
+            "check_out_date": {"$gte": start_date, "$lte": end_date}
+        }).to_list(1000)
+        
         occupied_days = len(completed_bookings)
         days_in_month = (end_date - start_date).days + 1
         occupancy_rate = (occupied_days / (total_rooms * days_in_month)) * 100 if total_rooms > 0 else 0
@@ -726,7 +728,7 @@ async def get_monthly_reports(year: Optional[int] = None):
             "revenue": monthly_revenue,
             "expenses": monthly_expenses,
             "profit": monthly_profit,
-            "bookings_count": len(completed_bookings),
+            "sales_count": len(daily_sales),
             "occupancy_rate": round(occupancy_rate, 2)
         })
     
