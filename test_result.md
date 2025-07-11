@@ -329,7 +329,7 @@ test_plan:
 
 agent_communication:
   - agent: "main"
-    message: "Complete hotel management system implemented with dashboard, rooms, guests, bookings, and expense management. Enhanced with financial tracking and profit calculations. All major features implemented. Ready for comprehensive testing of new features and full system integration."
+    message: "Enhanced checkout functionality with payment method selection and daily sales tracking. Backend now records all checkout transactions in daily_sales collection with payment method details. Frontend checkout modal improved with empty default values, payment method dropdown, and wider modal design. Ready for testing the enhanced checkout flow."
   - agent: "testing"
     message: "BACKEND TESTING COMPLETED - All 3 backend API tasks are now fully functional and tested. Fixed critical BSON serialization issue with date objects that was preventing sample data creation. All endpoints tested successfully: health check, sample data initialization, room management, booking management, customer management, and checkout functionality. Backend API is ready for frontend integration. Comprehensive test suite created at /app/backend_test.py for future regression testing."
   - agent: "testing"
