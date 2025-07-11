@@ -176,7 +176,8 @@ const Dashboard = () => {
     const roomCharges = selectedCustomer.room_charges || 500;
     const advanceAmount = selectedCustomer.advance_amount || 0;
     const additionalAmount = checkoutData.additional_amount || 0;
-    return roomCharges + additionalAmount - advanceAmount;
+    const discountAmount = checkoutData.discount_amount || 0;
+    return roomCharges + additionalAmount - advanceAmount - discountAmount;
   };
 
   const handleNewBooking = async () => {
