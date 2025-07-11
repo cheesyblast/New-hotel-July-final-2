@@ -38,6 +38,7 @@ const Dashboard = () => {
     room_number: '',
     check_in_date: '',
     check_out_date: '',
+    stay_type: 'Night Stay',
     additional_notes: ''
   });
   const [editBookingData, setEditBookingData] = useState({
