@@ -616,9 +616,13 @@ const Dashboard = () => {
                     <span>Additional Charges:</span>
                     <span>${checkoutData.additional_amount}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span>Discount:</span>
+                    <span>-${checkoutData.discount_amount}</span>
+                  </div>
                   <hr className="my-2" />
                   <div className="flex justify-between font-semibold">
-                    <span>Total Amount:</span>
+                    <span>Subtotal:</span>
                     <span>${calculateTotal()}</span>
                   </div>
                 </div>
@@ -635,6 +639,39 @@ const Dashboard = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="0.00"
                 />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Discount Amount ($)
+                </label>
+                <input
+                  type="number"
+                  value={checkoutData.discount_amount}
+                  onChange={(e) => setCheckoutData({...checkoutData, discount_amount: parseFloat(e.target.value) || 0})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="0.00"
+                />
+              </div>
+
+              {/* Balance Payable - Real-time Display */}
+              <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                <div className="flex items-center justify-center">
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-green-700 mb-1">Balance Payable</p>
+                    <p className={`text-3xl font-bold ${
+                      calculateTotal() >= 0 ? 'text-green-800' : 'text-red-600'
+                    }`}>
+                      ${Math.abs(calculateTotal()).toFixed(2)}
+                    </p>
+                    {calculateTotal() < 0 && (
+                      <p className="text-xs text-red-600 mt-1">Refund Due to Customer</p>
+                    )}
+                    {calculateTotal() >= 0 && (
+                      <p className="text-xs text-green-600 mt-1">Amount to Collect</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
             
