@@ -342,9 +342,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Financial Reports Integration with Daily Sales"
-    - "Enhanced Checkout with Payment Methods and Daily Sales"
-    - "Enhanced Checkout Modal UI"
+    - "Hotel Dashboard - Room Status Quick View"
+    - "Hotel Dashboard - Booking Management with Modals"
+    - "Rooms Management Page"
+    - "Guests Management Page"
+    - "Bookings Management Page"
+    - "Expenses and Profit Management Page"
+    - "Navigation and Routing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
