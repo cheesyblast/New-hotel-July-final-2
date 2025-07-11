@@ -175,6 +175,21 @@ async def checkout_customer(checkout: CheckoutRequest):
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
     
+    # Calculate total amount
+    base_room_charges = customer.get('room_charges', 500.0)  # Default room charge
+    advance_amount = customer.get('advance_amount', 0.0)
+    additional_amount = checkout.additional_amount
+    total_amount = base_room_charges + additional_amount - advance_amount
+    
+    # Update customer with final billing details
+    await db.customers.update_one(
+        {"id": checkout.customer_id},
+        {"$set": {
+            "additional_charges": additional_amount,
+            "total_amount": total_amount
+        }}
+    )
+    
     # Remove customer from checked-in list
     result = await db.customers.delete_one({"id": checkout.customer_id})
     if result.deleted_count == 0:
@@ -186,12 +201,20 @@ async def checkout_customer(checkout: CheckoutRequest):
         {"$set": {"status": "Available", "current_guest": None, "check_in_date": None, "check_out_date": None}}
     )
     
-    return {"message": "Customer checked out successfully"}
+    return {
+        "message": "Customer checked out successfully",
+        "billing_details": {
+            "room_charges": base_room_charges,
+            "advance_amount": advance_amount,
+            "additional_charges": additional_amount,
+            "total_amount": total_amount
+        }
+    }
 
-@api_router.post("/checkin/{booking_id}")
-async def checkin_customer(booking_id: str):
+@api_router.post("/checkin")
+async def checkin_customer(checkin: CheckinRequest):
     # Find the booking
-    booking = await db.bookings.find_one({"id": booking_id})
+    booking = await db.bookings.find_one({"id": checkin.booking_id})
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     
@@ -203,6 +226,13 @@ async def checkin_customer(booking_id: str):
     if room["status"] != "Available":
         raise HTTPException(status_code=400, detail="Room is not available for check-in")
     
+    # Calculate room charges based on room type
+    room_charges = {
+        "Suite": 1000.0,
+        "Double": 500.0,
+        "Triple": 750.0
+    }.get(room["room_type"], 500.0)
+    
     # Create customer record
     customer = Customer(
         name=booking["guest_name"],
@@ -210,7 +240,11 @@ async def checkin_customer(booking_id: str):
         phone=booking["guest_phone"],
         current_room=booking["room_number"],
         check_in_date=booking["check_in_date"] if isinstance(booking["check_in_date"], date) else booking["check_in_date"].date(),
-        check_out_date=booking["check_out_date"] if isinstance(booking["check_out_date"], date) else booking["check_out_date"].date()
+        check_out_date=booking["check_out_date"] if isinstance(booking["check_out_date"], date) else booking["check_out_date"].date(),
+        advance_amount=checkin.advance_amount,
+        notes=checkin.notes,
+        room_charges=room_charges,
+        total_amount=room_charges - checkin.advance_amount
     )
     
     # Add customer to checked-in list
@@ -232,7 +266,7 @@ async def checkin_customer(booking_id: str):
     
     # Update booking status to checked-in
     await db.bookings.update_one(
-        {"id": booking_id},
+        {"id": checkin.booking_id},
         {"$set": {"status": "Checked-in"}}
     )
     
