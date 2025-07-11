@@ -588,6 +588,122 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* New Booking Modal */}
+      {showNewBookingModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Create New Booking</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Guest Name *
+                </label>
+                <input
+                  type="text"
+                  value={newBookingData.guest_name}
+                  onChange={(e) => setNewBookingData({...newBookingData, guest_name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter guest name"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  value={newBookingData.guest_email}
+                  onChange={(e) => setNewBookingData({...newBookingData, guest_email: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter email address"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone *
+                </label>
+                <input
+                  type="tel"
+                  value={newBookingData.guest_phone}
+                  onChange={(e) => setNewBookingData({...newBookingData, guest_phone: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter phone number"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Room *
+                </label>
+                <select
+                  value={newBookingData.room_number}
+                  onChange={(e) => setNewBookingData({...newBookingData, room_number: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                >
+                  <option value="">Select a room</option>
+                  {getAvailableRooms().map((room) => (
+                    <option key={room.id} value={room.room_number}>
+                      {room.room_number} - {room.room_type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Check-in Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={newBookingData.check_in_date}
+                    onChange={(e) => setNewBookingData({...newBookingData, check_in_date: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Check-out Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={newBookingData.check_out_date}
+                    onChange={(e) => setNewBookingData({...newBookingData, check_out_date: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowNewBookingModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleNewBooking}
+                disabled={!newBookingData.guest_name || !newBookingData.guest_email || !newBookingData.guest_phone || !newBookingData.room_number || !newBookingData.check_in_date || !newBookingData.check_out_date}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                Create Booking
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
