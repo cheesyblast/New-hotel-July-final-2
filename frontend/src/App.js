@@ -422,6 +422,131 @@ function App() {
           </div>
         </div>
       </main>
+
+      {/* Check-in Modal */}
+      {showCheckinModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Check In Customer</h3>
+            {selectedBooking && (
+              <div className="mb-4">
+                <p className="text-sm text-gray-600">Guest: {selectedBooking.guest_name}</p>
+                <p className="text-sm text-gray-600">Room: {selectedBooking.room_number}</p>
+                <p className="text-sm text-gray-600">Phone: {selectedBooking.guest_phone}</p>
+              </div>
+            )}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Advance Amount ($)
+                </label>
+                <input
+                  type="number"
+                  value={checkinData.advance_amount}
+                  onChange={(e) => setCheckinData({...checkinData, advance_amount: parseFloat(e.target.value) || 0})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Notes
+                </label>
+                <textarea
+                  value={checkinData.notes}
+                  onChange={(e) => setCheckinData({...checkinData, notes: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows="3"
+                  placeholder="Any special notes..."
+                />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowCheckinModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmCheckin}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+              >
+                Confirm Check In
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Checkout Modal */}
+      {showCheckoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Checkout Customer</h3>
+            {selectedCustomer && (
+              <div className="mb-4">
+                <p className="text-sm text-gray-600">Guest: {selectedCustomer.name}</p>
+                <p className="text-sm text-gray-600">Room: {selectedCustomer.current_room}</p>
+                <p className="text-sm text-gray-600">Phone: {selectedCustomer.phone}</p>
+              </div>
+            )}
+            
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-md">
+                <h4 className="font-medium text-gray-800 mb-2">Billing Details</h4>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span>Room Charges:</span>
+                    <span>${selectedCustomer?.room_charges || 500}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Advance Paid:</span>
+                    <span>-${selectedCustomer?.advance_amount || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Additional Charges:</span>
+                    <span>${checkoutData.additional_amount}</span>
+                  </div>
+                  <hr className="my-2" />
+                  <div className="flex justify-between font-semibold">
+                    <span>Total Amount:</span>
+                    <span>${calculateTotal()}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Additional Amount ($)
+                </label>
+                <input
+                  type="number"
+                  value={checkoutData.additional_amount}
+                  onChange={(e) => setCheckoutData({...checkoutData, additional_amount: parseFloat(e.target.value) || 0})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowCheckoutModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmCheckout}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                Confirm Checkout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
