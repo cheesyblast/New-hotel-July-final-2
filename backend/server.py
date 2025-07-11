@@ -177,6 +177,81 @@ async def checkout_customer(checkout: CheckoutRequest):
     
     return {"message": "Customer checked out successfully"}
 
+@api_router.post("/checkin/{booking_id}")
+async def checkin_customer(booking_id: str):
+    # Find the booking
+    booking = await db.bookings.find_one({"id": booking_id})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Check if room is available
+    room = await db.rooms.find_one({"room_number": booking["room_number"]})
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
+    
+    if room["status"] != "Available":
+        raise HTTPException(status_code=400, detail="Room is not available for check-in")
+    
+    # Create customer record
+    customer = Customer(
+        name=booking["guest_name"],
+        email=booking["guest_email"],
+        phone=booking["guest_phone"],
+        current_room=booking["room_number"],
+        check_in_date=booking["check_in_date"] if isinstance(booking["check_in_date"], date) else booking["check_in_date"].date(),
+        check_out_date=booking["check_out_date"] if isinstance(booking["check_out_date"], date) else booking["check_out_date"].date()
+    )
+    
+    # Add customer to checked-in list
+    customer_dict = customer.dict()
+    customer_dict['check_in_date'] = datetime.combine(customer_dict['check_in_date'], datetime.min.time())
+    customer_dict['check_out_date'] = datetime.combine(customer_dict['check_out_date'], datetime.min.time())
+    await db.customers.insert_one(customer_dict)
+    
+    # Update room status to occupied
+    await db.rooms.update_one(
+        {"room_number": booking["room_number"]},
+        {"$set": {
+            "status": "Occupied",
+            "current_guest": booking["guest_name"],
+            "check_in_date": datetime.combine(booking["check_in_date"] if isinstance(booking["check_in_date"], date) else booking["check_in_date"].date(), datetime.min.time()),
+            "check_out_date": datetime.combine(booking["check_out_date"] if isinstance(booking["check_out_date"], date) else booking["check_out_date"].date(), datetime.min.time())
+        }}
+    )
+    
+    # Update booking status to checked-in
+    await db.bookings.update_one(
+        {"id": booking_id},
+        {"$set": {"status": "Checked-in"}}
+    )
+    
+    return {"message": "Customer checked in successfully", "customer": customer}
+
+@api_router.post("/cancel/{booking_id}")
+async def cancel_booking(booking_id: str):
+    # Find the booking
+    booking = await db.bookings.find_one({"id": booking_id})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Update booking status to cancelled
+    result = await db.bookings.update_one(
+        {"id": booking_id},
+        {"$set": {"status": "Cancelled"}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # If room was reserved for this booking, make it available
+    if booking["status"] == "Upcoming":
+        await db.rooms.update_one(
+            {"room_number": booking["room_number"], "status": "Reserved"},
+            {"$set": {"status": "Available", "current_guest": None, "check_in_date": None, "check_out_date": None}}
+        )
+    
+    return {"message": "Booking cancelled successfully"}
+
 # Initialize sample data
 @api_router.post("/init-data")
 async def initialize_sample_data():
