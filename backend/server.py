@@ -108,11 +108,19 @@ async def get_bookings():
 
 @api_router.get("/bookings/upcoming", response_model=List[Booking])
 async def get_upcoming_bookings():
-    today = datetime.now().date()
+    today = datetime.combine(datetime.now().date(), datetime.min.time())
     bookings = await db.bookings.find({
         "status": "Upcoming",
         "check_in_date": {"$gte": today}
     }).sort("check_in_date", 1).to_list(10)
+    
+    # Convert datetime back to date for response
+    for booking in bookings:
+        if isinstance(booking.get('check_in_date'), datetime):
+            booking['check_in_date'] = booking['check_in_date'].date()
+        if isinstance(booking.get('check_out_date'), datetime):
+            booking['check_out_date'] = booking['check_out_date'].date()
+    
     return [Booking(**booking) for booking in bookings]
 
 @api_router.post("/bookings", response_model=Booking)
