@@ -75,9 +75,21 @@ function App() {
     }
   };
 
-  const handleCheckout = async (customerId) => {
+  const handleCheckout = async (customer) => {
+    setSelectedCustomer(customer);
+    setCheckoutData({ additional_amount: 0 });
+    setShowCheckoutModal(true);
+  };
+
+  const confirmCheckout = async () => {
     try {
-      await axios.post(`${API}/checkout`, { customer_id: customerId });
+      await axios.post(`${API}/checkout`, {
+        customer_id: selectedCustomer.id,
+        additional_amount: checkoutData.additional_amount
+      });
+      
+      setShowCheckoutModal(false);
+      setSelectedCustomer(null);
       
       // Refresh data after checkout
       await Promise.all([
@@ -89,9 +101,22 @@ function App() {
     }
   };
 
-  const handleCheckin = async (bookingId) => {
+  const handleCheckin = async (booking) => {
+    setSelectedBooking(booking);
+    setCheckinData({ advance_amount: 0, notes: '' });
+    setShowCheckinModal(true);
+  };
+
+  const confirmCheckin = async () => {
     try {
-      await axios.post(`${API}/checkin/${bookingId}`);
+      await axios.post(`${API}/checkin`, {
+        booking_id: selectedBooking.id,
+        advance_amount: checkinData.advance_amount,
+        notes: checkinData.notes
+      });
+      
+      setShowCheckinModal(false);
+      setSelectedBooking(null);
       
       // Refresh all data after check-in
       await Promise.all([
@@ -120,6 +145,14 @@ function App() {
         alert('Error cancelling booking. Please try again.');
       }
     }
+  };
+
+  const calculateTotal = () => {
+    if (!selectedCustomer) return 0;
+    const roomCharges = selectedCustomer.room_charges || 500;
+    const advanceAmount = selectedCustomer.advance_amount || 0;
+    const additionalAmount = checkoutData.additional_amount || 0;
+    return roomCharges + additionalAmount - advanceAmount;
   };
 
   const getRoomStatusColor = (status) => {
