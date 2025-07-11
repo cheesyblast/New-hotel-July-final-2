@@ -111,6 +111,21 @@ async def create_room(room: RoomCreate):
     await db.rooms.insert_one(room_obj.dict())
     return room_obj
 
+@api_router.put("/rooms/{room_id}")
+async def update_room(room_id: str, room: RoomCreate):
+    room_dict = room.dict()
+    result = await db.rooms.update_one({"id": room_id}, {"$set": room_dict})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Room not found")
+    return {"message": "Room updated successfully"}
+
+@api_router.delete("/rooms/{room_id}")
+async def delete_room(room_id: str):
+    result = await db.rooms.delete_one({"id": room_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Room not found")
+    return {"message": "Room deleted successfully"}
+
 @api_router.put("/rooms/{room_id}/status")
 async def update_room_status(room_id: str, status: str, guest_name: Optional[str] = None, check_in_date: Optional[date] = None, check_out_date: Optional[date] = None):
     update_data = {"status": status}
