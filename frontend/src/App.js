@@ -14,6 +14,7 @@ function App() {
   // Modal states
   const [showCheckinModal, setShowCheckinModal] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [showNewBookingModal, setShowNewBookingModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   
@@ -24,6 +25,14 @@ function App() {
   });
   const [checkoutData, setCheckoutData] = useState({
     additional_amount: 0
+  });
+  const [newBookingData, setNewBookingData] = useState({
+    guest_name: '',
+    guest_email: '',
+    guest_phone: '',
+    room_number: '',
+    check_in_date: '',
+    check_out_date: ''
   });
 
   useEffect(() => {
