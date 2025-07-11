@@ -152,12 +152,15 @@ backend:
 
   - task: "Hotel Management API - Guest Management"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
+      - working: true
+        agent: "testing"
+        comment: "PASSED - Guest management endpoints working correctly. GET /api/guests returns 6 guests with complete statistics (total bookings, total stays, upcoming bookings, last stay, booking history). GET /api/guests/{email} returns detailed guest information with full booking history. Guest aggregation from bookings data working perfectly."
       - working: "NA"
         agent: "main"
         comment: "Implemented guest aggregation from bookings with statistics and booking history tracking."
