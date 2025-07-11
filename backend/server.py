@@ -308,6 +308,24 @@ async def checkout_customer(checkout: CheckoutRequest):
     discount_amount = checkout.discount_amount
     total_amount = base_room_charges + additional_amount - advance_amount - discount_amount
     
+    # Create daily sales record
+    daily_sale = DailySale(
+        date=datetime.now().date(),
+        customer_name=customer.get('name', ''),
+        room_number=customer.get('current_room', ''),
+        room_charges=base_room_charges,
+        additional_charges=additional_amount,
+        discount_amount=discount_amount,
+        advance_amount=advance_amount,
+        total_amount=total_amount,
+        payment_method=checkout.payment_method
+    )
+    
+    # Store the daily sale record
+    daily_sale_dict = daily_sale.dict()
+    daily_sale_dict['date'] = datetime.combine(daily_sale_dict['date'], datetime.min.time())
+    await db.daily_sales.insert_one(daily_sale_dict)
+    
     # Update customer with final billing details
     await db.customers.update_one(
         {"id": checkout.customer_id},
@@ -336,7 +354,8 @@ async def checkout_customer(checkout: CheckoutRequest):
             "advance_amount": advance_amount,
             "additional_charges": additional_amount,
             "discount_amount": discount_amount,
-            "total_amount": total_amount
+            "total_amount": total_amount,
+            "payment_method": checkout.payment_method
         }
     }
 
