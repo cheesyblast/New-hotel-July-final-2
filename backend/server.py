@@ -644,17 +644,14 @@ async def get_daily_reports(start_date: Optional[str] = None, end_date: Optional
         start_datetime = datetime.combine(current_date, datetime.min.time())
         end_datetime = datetime.combine(current_date, datetime.max.time())
         
-        # Calculate daily revenue from completed bookings
+        # Calculate daily revenue from actual daily sales (payment collected)
         daily_revenue = 0
-        completed_bookings = await db.bookings.find({
-            "status": "Completed",
-            "check_out_date": {"$gte": start_datetime, "$lte": end_datetime}
+        daily_sales = await db.daily_sales.find({
+            "date": {"$gte": start_datetime, "$lte": end_datetime}
         }).to_list(1000)
         
-        for booking in completed_bookings:
-            room = await db.rooms.find_one({"room_number": booking.get("room_number")})
-            if room:
-                daily_revenue += room.get("price_per_night", 500)
+        for sale in daily_sales:
+            daily_revenue += sale.get("total_amount", 0)
         
         # Calculate daily expenses
         daily_expenses = 0
@@ -672,7 +669,7 @@ async def get_daily_reports(start_date: Optional[str] = None, end_date: Optional
             "revenue": daily_revenue,
             "expenses": daily_expenses,
             "profit": daily_profit,
-            "bookings_count": len(completed_bookings),
+            "sales_count": len(daily_sales),
             "expenses_count": len(expenses)
         })
         
