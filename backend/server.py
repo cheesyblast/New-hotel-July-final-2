@@ -875,29 +875,39 @@ async def get_financial_summary(start_date: Optional[str] = None, end_date: Opti
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
         end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
     
+    # Convert dates to datetime for MongoDB query
     start_datetime = datetime.combine(start_date, datetime.min.time())
     end_datetime = datetime.combine(end_date, datetime.max.time())
     
-    # Calculate revenue from completed bookings
-    completed_bookings = await db.bookings.find({
-        "status": "Completed",
-        "check_out_date": {"$gte": start_datetime, "$lte": end_datetime}
+    # Calculate revenue from actual daily sales (payment collected)
+    daily_sales = await db.daily_sales.find({
+        "date": {"$gte": start_datetime, "$lte": end_datetime}
     }).to_list(1000)
     
     total_revenue = 0
     revenue_breakdown = {}
+    payment_method_breakdown = {}
     
-    for booking in completed_bookings:
-        # Get room details to calculate revenue
-        room = await db.rooms.find_one({"room_number": booking.get("room_number")})
-        if room:
-            room_revenue = room.get("price_per_night", 500) * 1  # Assuming 1 night for simplicity
-            total_revenue += room_revenue
-            
-            room_type = room.get("room_type", "Unknown")
-            if room_type not in revenue_breakdown:
-                revenue_breakdown[room_type] = 0
-            revenue_breakdown[room_type] += room_revenue
+    for sale in daily_sales:
+        # Total revenue from actual payments collected
+        sale_amount = sale.get("total_amount", 0)
+        total_revenue += sale_amount
+        
+        # Revenue breakdown by room type (get room info for breakdown)
+        room_number = sale.get("room_number", "")
+        if room_number:
+            room = await db.rooms.find_one({"room_number": room_number})
+            if room:
+                room_type = room.get("room_type", "Unknown")
+                if room_type not in revenue_breakdown:
+                    revenue_breakdown[room_type] = 0
+                revenue_breakdown[room_type] += sale_amount
+        
+        # Payment method breakdown
+        payment_method = sale.get("payment_method", "Unknown")
+        if payment_method not in payment_method_breakdown:
+            payment_method_breakdown[payment_method] = 0
+        payment_method_breakdown[payment_method] += sale_amount
     
     # Calculate expenses
     expenses = await db.expenses.find({
@@ -924,6 +934,7 @@ async def get_financial_summary(start_date: Optional[str] = None, end_date: Opti
         "net_profit": net_profit,
         "revenue_breakdown": revenue_breakdown,
         "expense_breakdown": expense_breakdown,
+        "payment_method_breakdown": payment_method_breakdown,
         "period_start": start_date,
         "period_end": end_date
     }
