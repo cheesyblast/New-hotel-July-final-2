@@ -100,7 +100,7 @@ const Dashboard = () => {
 
   const handleCheckout = async (customer) => {
     setSelectedCustomer(customer);
-    setCheckoutData({ additional_amount: 0 });
+    setCheckoutData({ additional_amount: 0, discount_amount: 0 });
     setShowCheckoutModal(true);
   };
 
