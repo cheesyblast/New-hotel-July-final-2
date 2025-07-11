@@ -242,184 +242,183 @@ const Dashboard = () => {
         </button>
       </div>
 
-        {/* Room Status - Quick View */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Room Status - Quick View</h3>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {rooms.map((room) => (
-              <div
-                key={room.id}
-                className={`p-4 rounded-lg border-2 ${getRoomStatusColor(room.status)} shadow-sm hover:shadow-md transition-shadow`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-lg font-bold text-gray-900">{room.room_number}</h4>
-                  <span className="text-lg">{getStatusIcon(room.status)}</span>
+      {/* Room Status - Quick View */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Room Status - Quick View</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {rooms.map((room) => (
+            <div
+              key={room.id}
+              className={`p-4 rounded-lg border-2 ${getRoomStatusColor(room.status)} shadow-sm hover:shadow-md transition-shadow`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-lg font-bold text-gray-900">{room.room_number}</h4>
+                <span className="text-lg">{getStatusIcon(room.status)}</span>
+              </div>
+              <p className="text-sm text-gray-600 mb-1">{room.room_type}</p>
+              <p className={`text-sm font-medium ${
+                room.status === 'Available' ? 'text-green-700' :
+                room.status === 'Occupied' ? 'text-red-700' :
+                'text-yellow-700'
+              }`}>
+                {room.status}
+              </p>
+              {room.current_guest && (
+                <div className="mt-2 pt-2 border-t border-gray-200">
+                  <p className="text-xs text-gray-500">Guest: {room.current_guest}</p>
+                  {room.check_out_date && (
+                    <p className="text-xs text-gray-500">Out: {room.check_out_date}</p>
+                  )}
                 </div>
-                <p className="text-sm text-gray-600 mb-1">{room.room_type}</p>
-                <p className={`text-sm font-medium ${
-                  room.status === 'Available' ? 'text-green-700' :
-                  room.status === 'Occupied' ? 'text-red-700' :
-                  'text-yellow-700'
-                }`}>
-                  {room.status}
-                </p>
-                {room.current_guest && (
-                  <div className="mt-2 pt-2 border-t border-gray-200">
-                    <p className="text-xs text-gray-500">Guest: {room.current_guest}</p>
-                    {room.check_out_date && (
-                      <p className="text-xs text-gray-500">Out: {room.check_out_date}</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          ))}
         </div>
+      </div>
 
-        {/* Upcoming Bookings */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Upcoming Bookings</h3>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            {upcomingBookings.length === 0 ? (
-              <div className="p-6 text-center text-gray-500">
-                No upcoming bookings
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Guest Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Room
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Check-in
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Check-out
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Contact
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {upcomingBookings.map((booking) => (
-                      <tr key={booking.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{booking.guest_name}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{booking.room_number}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{booking.check_in_date}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{booking.check_out_date}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{booking.guest_phone}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleCheckin(booking)}
-                              className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors"
-                            >
-                              Check In
-                            </button>
-                            <button
-                              onClick={() => handleCancelBooking(booking.id)}
-                              className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Checked-in Customers */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Checked-in Customers</h3>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            {checkedInCustomers.length === 0 ? (
-              <div className="p-6 text-center text-gray-500">
-                No customers currently checked in
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Customer Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Room
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Check-in Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Check-out Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Contact
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {checkedInCustomers.map((customer) => (
-                      <tr key={customer.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{customer.name}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{customer.current_room}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{customer.check_in_date}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{customer.check_out_date}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{customer.phone}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+      {/* Upcoming Bookings */}
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Upcoming Bookings</h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          {upcomingBookings.length === 0 ? (
+            <div className="p-6 text-center text-gray-500">
+              No upcoming bookings
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Guest Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Room
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Check-in
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Check-out
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Contact
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {upcomingBookings.map((booking) => (
+                    <tr key={booking.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{booking.guest_name}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{booking.room_number}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{booking.check_in_date}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{booking.check_out_date}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{booking.guest_phone}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex space-x-2">
                           <button
-                            onClick={() => handleCheckout(customer)}
+                            onClick={() => handleCheckin(booking)}
+                            className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors"
+                          >
+                            Check In
+                          </button>
+                          <button
+                            onClick={() => handleCancelBooking(booking.id)}
                             className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
                           >
-                            Checkout
+                            Cancel
                           </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Checked-in Customers */}
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Checked-in Customers</h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          {checkedInCustomers.length === 0 ? (
+            <div className="p-6 text-center text-gray-500">
+              No customers currently checked in
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Customer Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Room
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Check-in Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Check-out Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Contact
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {checkedInCustomers.map((customer) => (
+                    <tr key={customer.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{customer.name}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{customer.current_room}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{customer.check_in_date}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{customer.check_out_date}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{customer.phone}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => handleCheckout(customer)}
+                          className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
+                        >
+                          Checkout
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 
@@ -790,243 +789,241 @@ const Rooms = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Rooms</h2>
-            <p className="text-gray-600">Manage hotel rooms and their details</p>
-          </div>
-          <button 
-            onClick={() => setShowAddRoomModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center space-x-2"
-          >
-            <span>Add Room</span>
-          </button>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Rooms</h2>
+          <p className="text-gray-600">Manage hotel rooms and their details</p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rooms.map((room) => (
-            <div key={room.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="relative">
-                <img 
-                  src={room.image_url} 
-                  alt={`Room ${room.room_number}`}
-                  className="w-full h-48 object-cover"
-                />
-                <div className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(room.status)}`}>
-                  {room.status}
-                </div>
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">Room {room.room_number}</h3>
-                <p className="text-sm text-gray-600 mb-2">{room.room_type}</p>
-                <p className="text-lg font-bold text-gray-900 mb-2">Rs.{room.price_per_night}/night</p>
-                <p className="text-sm text-gray-600 mb-2">Max Occupancy: {room.max_occupancy}</p>
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600">Amenities: {room.amenities?.join(', ')}</p>
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => openEditModal(room)}
-                    className="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700 transition-colors"
-                  >
-                    Edit Room
-                  </button>
-                  <button
-                    onClick={() => handleDeleteRoom(room.id)}
-                    className="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition-colors"
-                  >
-                    Remove Room
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Add Room Modal */}
-        {showAddRoomModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-              <h3 className="text-lg font-semibold mb-4">Add New Room</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Number *</label>
-                  <input
-                    type="text"
-                    value={roomData.room_number}
-                    onChange={(e) => setRoomData({...roomData, room_number: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter room number"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Type *</label>
-                  <select
-                    value={roomData.room_type}
-                    onChange={(e) => setRoomData({...roomData, room_type: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select room type</option>
-                    <option value="Single">Single</option>
-                    <option value="Double">Double</option>
-                    <option value="Triple">Triple</option>
-                    <option value="Suite">Suite</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Price per Night *</label>
-                  <input
-                    type="number"
-                    value={roomData.price_per_night}
-                    onChange={(e) => setRoomData({...roomData, price_per_night: parseFloat(e.target.value) || 0})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter price"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Max Occupancy *</label>
-                  <input
-                    type="number"
-                    value={roomData.max_occupancy}
-                    onChange={(e) => setRoomData({...roomData, max_occupancy: parseInt(e.target.value) || 2})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    min="1"
-                    max="10"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Amenities</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {commonAmenities.map((amenity) => (
-                      <label key={amenity} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={roomData.amenities?.includes(amenity)}
-                          onChange={() => handleAmenityChange(amenity)}
-                          className="mr-2"
-                        />
-                        <span className="text-sm">{amenity}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => setShowAddRoomModal(false)}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddRoom}
-                  disabled={!roomData.room_number || !roomData.room_type || !roomData.price_per_night}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-                >
-                  Add Room
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Edit Room Modal */}
-        {showEditRoomModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-              <h3 className="text-lg font-semibold mb-4">Edit Room</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Number *</label>
-                  <input
-                    type="text"
-                    value={roomData.room_number}
-                    onChange={(e) => setRoomData({...roomData, room_number: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Type *</label>
-                  <select
-                    value={roomData.room_type}
-                    onChange={(e) => setRoomData({...roomData, room_type: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="Single">Single</option>
-                    <option value="Double">Double</option>
-                    <option value="Triple">Triple</option>
-                    <option value="Suite">Suite</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Price per Night *</label>
-                  <input
-                    type="number"
-                    value={roomData.price_per_night}
-                    onChange={(e) => setRoomData({...roomData, price_per_night: parseFloat(e.target.value) || 0})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Max Occupancy *</label>
-                  <input
-                    type="number"
-                    value={roomData.max_occupancy}
-                    onChange={(e) => setRoomData({...roomData, max_occupancy: parseInt(e.target.value) || 2})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    min="1"
-                    max="10"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Amenities</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {commonAmenities.map((amenity) => (
-                      <label key={amenity} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={roomData.amenities?.includes(amenity)}
-                          onChange={() => handleAmenityChange(amenity)}
-                          className="mr-2"
-                        />
-                        <span className="text-sm">{amenity}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => setShowEditRoomModal(false)}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleEditRoom}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Update Room
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <button 
+          onClick={() => setShowAddRoomModal(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center space-x-2"
+        >
+          <span>Add Room</span>
+        </button>
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {rooms.map((room) => (
+          <div key={room.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="relative">
+              <img 
+                src={room.image_url} 
+                alt={`Room ${room.room_number}`}
+                className="w-full h-48 object-cover"
+              />
+              <div className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(room.status)}`}>
+                {room.status}
+              </div>
+            </div>
+            <div className="p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">Room {room.room_number}</h3>
+              <p className="text-sm text-gray-600 mb-2">{room.room_type}</p>
+              <p className="text-lg font-bold text-gray-900 mb-2">Rs.{room.price_per_night}/night</p>
+              <p className="text-sm text-gray-600 mb-2">Max Occupancy: {room.max_occupancy}</p>
+              <div className="mb-4">
+                <p className="text-sm text-gray-600">Amenities: {room.amenities?.join(', ')}</p>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => openEditModal(room)}
+                  className="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700 transition-colors"
+                >
+                  Edit Room
+                </button>
+                <button
+                  onClick={() => handleDeleteRoom(room.id)}
+                  className="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition-colors"
+                >
+                  Remove Room
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Add Room Modal */}
+      {showAddRoomModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-4">Add New Room</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Room Number *</label>
+                <input
+                  type="text"
+                  value={roomData.room_number}
+                  onChange={(e) => setRoomData({...roomData, room_number: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter room number"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Room Type *</label>
+                <select
+                  value={roomData.room_type}
+                  onChange={(e) => setRoomData({...roomData, room_type: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select room type</option>
+                  <option value="Single">Single</option>
+                  <option value="Double">Double</option>
+                  <option value="Triple">Triple</option>
+                  <option value="Suite">Suite</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Price per Night *</label>
+                <input
+                  type="number"
+                  value={roomData.price_per_night}
+                  onChange={(e) => setRoomData({...roomData, price_per_night: parseFloat(e.target.value) || 0})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter price"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Max Occupancy *</label>
+                <input
+                  type="number"
+                  value={roomData.max_occupancy}
+                  onChange={(e) => setRoomData({...roomData, max_occupancy: parseInt(e.target.value) || 2})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="1"
+                  max="10"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Amenities</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {commonAmenities.map((amenity) => (
+                    <label key={amenity} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={roomData.amenities?.includes(amenity)}
+                        onChange={() => handleAmenityChange(amenity)}
+                        className="mr-2"
+                      />
+                      <span className="text-sm">{amenity}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowAddRoomModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddRoom}
+                disabled={!roomData.room_number || !roomData.room_type || !roomData.price_per_night}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+              >
+                Add Room
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Room Modal */}
+      {showEditRoomModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-4">Edit Room</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Room Number *</label>
+                <input
+                  type="text"
+                  value={roomData.room_number}
+                  onChange={(e) => setRoomData({...roomData, room_number: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Room Type *</label>
+                <select
+                  value={roomData.room_type}
+                  onChange={(e) => setRoomData({...roomData, room_type: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="Single">Single</option>
+                  <option value="Double">Double</option>
+                  <option value="Triple">Triple</option>
+                  <option value="Suite">Suite</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Price per Night *</label>
+                <input
+                  type="number"
+                  value={roomData.price_per_night}
+                  onChange={(e) => setRoomData({...roomData, price_per_night: parseFloat(e.target.value) || 0})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Max Occupancy *</label>
+                <input
+                  type="number"
+                  value={roomData.max_occupancy}
+                  onChange={(e) => setRoomData({...roomData, max_occupancy: parseInt(e.target.value) || 2})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="1"
+                  max="10"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Amenities</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {commonAmenities.map((amenity) => (
+                    <label key={amenity} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={roomData.amenities?.includes(amenity)}
+                        onChange={() => handleAmenityChange(amenity)}
+                        className="mr-2"
+                      />
+                      <span className="text-sm">{amenity}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowEditRoomModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditRoom}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Update Room
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
