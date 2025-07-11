@@ -421,7 +421,7 @@ const Dashboard = () => {
             )}
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Check-in Modal */}
       {showCheckinModal && (
