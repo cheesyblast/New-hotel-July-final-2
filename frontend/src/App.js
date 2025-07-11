@@ -472,6 +472,34 @@ const Dashboard = () => {
                           Checkout
                         </button>
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => {
+                            // Find the booking for this customer
+                            const booking = upcomingBookings.find(b => 
+                              b.guest_name === customer.name && 
+                              b.room_number === customer.current_room
+                            );
+                            if (booking) {
+                              openEditBookingModal(booking);
+                            } else {
+                              // Create a mock booking object for checked-in customers
+                              const mockBooking = {
+                                id: customer.id,
+                                guest_name: customer.name,
+                                room_number: customer.current_room,
+                                check_in_date: customer.check_in_date,
+                                check_out_date: customer.check_out_date,
+                                additional_notes: customer.notes || ''
+                              };
+                              openEditBookingModal(mockBooking);
+                            }
+                          }}
+                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
+                        >
+                          Edit Booking
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
