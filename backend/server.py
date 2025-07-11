@@ -57,6 +57,7 @@ class Booking(BaseModel):
     room_number: str
     check_in_date: date
     check_out_date: date
+    stay_type: str = "Night Stay"  # "Night Stay" or "Short Time"
     status: str  # Upcoming, Checked-in, Completed, Cancelled
     additional_notes: str = ""
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -69,7 +70,8 @@ class BookingCreate(BaseModel):
     guest_country: str = ""
     room_number: str
     check_in_date: date
-    check_out_date: date
+    check_out_date: Optional[date] = None
+    stay_type: str = "Night Stay"
     additional_notes: str = ""
 
 class BookingUpdate(BaseModel):
