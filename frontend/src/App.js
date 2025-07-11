@@ -873,6 +873,414 @@ const Dashboard = () => {
   );
 };
 
+// Reports Component
+const Reports = () => {
+  const [dailyReports, setDailyReports] = useState([]);
+  const [monthlyReports, setMonthlyReports] = useState([]);
+  const [monthComparison, setMonthComparison] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedView, setSelectedView] = useState('daily'); // daily, monthly, comparison
+
+  useEffect(() => {
+    fetchReportsData();
+  }, []);
+
+  const fetchReportsData = async () => {
+    try {
+      const [dailyResponse, monthlyResponse, comparisonResponse] = await Promise.all([
+        axios.get(`${API}/reports/daily`),
+        axios.get(`${API}/reports/monthly`),
+        axios.get(`${API}/reports/comparison`)
+      ]);
+      
+      setDailyReports(dailyResponse.data);
+      setMonthlyReports(monthlyResponse.data);
+      setMonthComparison(comparisonResponse.data);
+    } catch (error) {
+      console.error('Error fetching reports data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
+  const getChangeIndicator = (change) => {
+    if (change > 0) {
+      return <span className="text-green-600 font-medium">+{change}%</span>;
+    } else if (change < 0) {
+      return <span className="text-red-600 font-medium">{change}%</span>;
+    } else {
+      return <span className="text-gray-600 font-medium">0%</span>;
+    }
+  };
+
+  const getRecentDailyData = () => {
+    return dailyReports.slice(-7); // Last 7 days
+  };
+
+  const getCurrentMonthData = () => {
+    const currentMonth = new Date().getMonth() + 1;
+    return monthlyReports.find(m => m.month === currentMonth) || {};
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Reports & Analytics</h2>
+          <p className="text-gray-600">Financial performance and business insights</p>
+        </div>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setSelectedView('daily')}
+            className={`px-4 py-2 rounded-md text-sm font-medium ${
+              selectedView === 'daily' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Daily View
+          </button>
+          <button
+            onClick={() => setSelectedView('monthly')}
+            className={`px-4 py-2 rounded-md text-sm font-medium ${
+              selectedView === 'monthly' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Monthly View
+          </button>
+          <button
+            onClick={() => setSelectedView('comparison')}
+            className={`px-4 py-2 rounded-md text-sm font-medium ${
+              selectedView === 'comparison' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Comparison
+          </button>
+        </div>
+      </div>
+
+      {/* Month-to-Month Comparison */}
+      {monthComparison && (
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Last Month vs Current Month</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h4 className="text-sm font-medium text-gray-500 mb-2">Revenue</h4>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {formatCurrency(monthComparison.current_month.revenue)}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Last: {formatCurrency(monthComparison.last_month.revenue)}
+                  </p>
+                </div>
+                <div className="text-right">
+                  {getChangeIndicator(monthComparison.changes.revenue_change)}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h4 className="text-sm font-medium text-gray-500 mb-2">Expenses</h4>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {formatCurrency(monthComparison.current_month.expenses)}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Last: {formatCurrency(monthComparison.last_month.expenses)}
+                  </p>
+                </div>
+                <div className="text-right">
+                  {getChangeIndicator(monthComparison.changes.expenses_change)}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h4 className="text-sm font-medium text-gray-500 mb-2">Net Profit</h4>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-2xl font-bold ${
+                    monthComparison.current_month.profit >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {formatCurrency(monthComparison.current_month.profit)}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Last: {formatCurrency(monthComparison.last_month.profit)}
+                  </p>
+                </div>
+                <div className="text-right">
+                  {getChangeIndicator(monthComparison.changes.profit_change)}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h4 className="text-sm font-medium text-gray-500 mb-2">Bookings</h4>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {monthComparison.current_month.bookings_count}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Last: {monthComparison.last_month.bookings_count}
+                  </p>
+                </div>
+                <div className="text-right">
+                  {getChangeIndicator(monthComparison.changes.bookings_change)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Daily Reports View */}
+      {selectedView === 'daily' && (
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Daily Income & Expenses (Last 7 Days)</h3>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Revenue
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Expenses
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Net Profit
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Bookings
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Expense Items
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {getRecentDailyData().map((day) => (
+                    <tr key={day.date} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {new Date(day.date).toLocaleDateString()}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-bold text-green-600">
+                          {formatCurrency(day.revenue)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-bold text-red-600">
+                          {formatCurrency(day.expenses)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className={`text-sm font-bold ${
+                          day.profit >= 0 ? 'text-blue-600' : 'text-orange-600'
+                        }`}>
+                          {formatCurrency(day.profit)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{day.bookings_count}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{day.expenses_count}</div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Monthly Reports View */}
+      {selectedView === 'monthly' && (
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Performance Data</h3>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Month
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Revenue
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Expenses
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Net Profit
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Bookings
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Occupancy Rate
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {monthlyReports.map((month) => (
+                    <tr key={month.month} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{month.month_name}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-bold text-green-600">
+                          {formatCurrency(month.revenue)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-bold text-red-600">
+                          {formatCurrency(month.expenses)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className={`text-sm font-bold ${
+                          month.profit >= 0 ? 'text-blue-600' : 'text-orange-600'
+                        }`}>
+                          {formatCurrency(month.profit)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{month.bookings_count}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{month.occupancy_rate}%</div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Comparison View */}
+      {selectedView === 'comparison' && monthComparison && (
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Detailed Month Comparison</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Last Month */}
+            <div className="bg-gray-50 rounded-lg p-6">
+              <h4 className="text-lg font-medium text-gray-900 mb-4">Last Month Performance</h4>
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Revenue:</span>
+                  <span className="font-bold text-green-600">
+                    {formatCurrency(monthComparison.last_month.revenue)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Expenses:</span>
+                  <span className="font-bold text-red-600">
+                    {formatCurrency(monthComparison.last_month.expenses)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Net Profit:</span>
+                  <span className={`font-bold ${
+                    monthComparison.last_month.profit >= 0 ? 'text-blue-600' : 'text-orange-600'
+                  }`}>
+                    {formatCurrency(monthComparison.last_month.profit)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total Bookings:</span>
+                  <span className="font-bold text-gray-900">
+                    {monthComparison.last_month.bookings_count}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Expense Items:</span>
+                  <span className="font-bold text-gray-900">
+                    {monthComparison.last_month.expenses_count}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Current Month */}
+            <div className="bg-blue-50 rounded-lg p-6">
+              <h4 className="text-lg font-medium text-gray-900 mb-4">Current Month Performance</h4>
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Revenue:</span>
+                  <span className="font-bold text-green-600">
+                    {formatCurrency(monthComparison.current_month.revenue)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Expenses:</span>
+                  <span className="font-bold text-red-600">
+                    {formatCurrency(monthComparison.current_month.expenses)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Net Profit:</span>
+                  <span className={`font-bold ${
+                    monthComparison.current_month.profit >= 0 ? 'text-blue-600' : 'text-orange-600'
+                  }`}>
+                    {formatCurrency(monthComparison.current_month.profit)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total Bookings:</span>
+                  <span className="font-bold text-gray-900">
+                    {monthComparison.current_month.bookings_count}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Expense Items:</span>
+                  <span className="font-bold text-gray-900">
+                    {monthComparison.current_month.expenses_count}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Expenses Component
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
