@@ -680,29 +680,27 @@ const Dashboard = () => {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email *
+                    Email
                   </label>
                   <input
                     type="email"
                     value={newBookingData.guest_email}
                     onChange={(e) => setNewBookingData({...newBookingData, guest_email: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter email address"
-                    required
+                    placeholder="Enter email address (optional)"
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone *
+                    Phone
                   </label>
                   <input
                     type="tel"
                     value={newBookingData.guest_phone}
                     onChange={(e) => setNewBookingData({...newBookingData, guest_phone: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter phone number"
-                    required
+                    placeholder="Enter phone number (optional)"
                   />
                 </div>
                 
