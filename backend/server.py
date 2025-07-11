@@ -524,6 +524,107 @@ async def get_guest_details(guest_email: str):
     
     return guest_info
 
+# Expense Management Routes
+@api_router.get("/expenses", response_model=List[Expense])
+async def get_expenses():
+    expenses = await db.expenses.find().sort("expense_date", -1).to_list(1000)
+    
+    # Convert datetime back to date for response
+    for expense in expenses:
+        if isinstance(expense.get('expense_date'), datetime):
+            expense['expense_date'] = expense['expense_date'].date()
+    
+    return [Expense(**expense) for expense in expenses]
+
+@api_router.post("/expenses", response_model=Expense)
+async def create_expense(expense: ExpenseCreate):
+    expense_dict = expense.dict()
+    
+    # Convert date string to date object if needed
+    if isinstance(expense_dict.get('expense_date'), str):
+        expense_dict['expense_date'] = datetime.strptime(expense_dict['expense_date'], '%Y-%m-%d').date()
+    
+    expense_obj = Expense(**expense_dict)
+    
+    # Convert date to datetime for MongoDB storage
+    expense_storage = expense_obj.dict()
+    if expense_storage.get('expense_date'):
+        expense_storage['expense_date'] = datetime.combine(expense_storage['expense_date'], datetime.min.time())
+    
+    await db.expenses.insert_one(expense_storage)
+    return expense_obj
+
+@api_router.delete("/expenses/{expense_id}")
+async def delete_expense(expense_id: str):
+    result = await db.expenses.delete_one({"id": expense_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Expense not found")
+    return {"message": "Expense deleted successfully"}
+
+@api_router.get("/financial-summary")
+async def get_financial_summary(start_date: Optional[str] = None, end_date: Optional[str] = None):
+    # Default to current month if no dates provided
+    if not start_date or not end_date:
+        today = datetime.now().date()
+        start_date = today.replace(day=1)
+        end_date = today
+    else:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+    
+    start_datetime = datetime.combine(start_date, datetime.min.time())
+    end_datetime = datetime.combine(end_date, datetime.max.time())
+    
+    # Calculate revenue from completed bookings
+    completed_bookings = await db.bookings.find({
+        "status": "Completed",
+        "check_out_date": {"$gte": start_datetime, "$lte": end_datetime}
+    }).to_list(1000)
+    
+    total_revenue = 0
+    revenue_breakdown = {}
+    
+    for booking in completed_bookings:
+        # Get room details to calculate revenue
+        room = await db.rooms.find_one({"room_number": booking.get("room_number")})
+        if room:
+            room_revenue = room.get("price_per_night", 500) * 1  # Assuming 1 night for simplicity
+            total_revenue += room_revenue
+            
+            room_type = room.get("room_type", "Unknown")
+            if room_type not in revenue_breakdown:
+                revenue_breakdown[room_type] = 0
+            revenue_breakdown[room_type] += room_revenue
+    
+    # Calculate expenses
+    expenses = await db.expenses.find({
+        "expense_date": {"$gte": start_datetime, "$lte": end_datetime}
+    }).to_list(1000)
+    
+    total_expenses = 0
+    expense_breakdown = {}
+    
+    for expense in expenses:
+        amount = expense.get("amount", 0)
+        total_expenses += amount
+        
+        category = expense.get("category", "Other")
+        if category not in expense_breakdown:
+            expense_breakdown[category] = 0
+        expense_breakdown[category] += amount
+    
+    net_profit = total_revenue - total_expenses
+    
+    return {
+        "total_revenue": total_revenue,
+        "total_expenses": total_expenses,
+        "net_profit": net_profit,
+        "revenue_breakdown": revenue_breakdown,
+        "expense_breakdown": expense_breakdown,
+        "period_start": start_date,
+        "period_end": end_date
+    }
+
 # Test route
 @api_router.get("/")
 async def root():
