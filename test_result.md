@@ -222,12 +222,15 @@ backend:
 frontend:
   - task: "Enhanced Checkout Modal UI"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
+      - working: true
+        agent: "testing"
+        comment: "PASSED - Enhanced checkout modal functionality fully tested and working perfectly. ✅ Modal width enhanced to max-w-lg (wider than previous max-w-md). ✅ Additional Amount and Discount Amount fields start empty with no default zeros (placeholder shows '0.00' but fields are empty). ✅ Payment Method dropdown includes all 3 required options (Cash, Card, Bank Transfer) with Cash as default. ✅ Real-time balance calculation working correctly - balance updates immediately when entering additional amounts and discounts. ✅ Green balance display box shows correct calculations with proper styling. ✅ Complete checkout flow tested successfully - modal opens from dashboard checkout buttons, processes payments, and closes after successful checkout. ✅ Customer properly removed from checked-in list after checkout completion. All enhanced features validated and working as specified."
       - working: "NA"
         agent: "main"
         comment: "Updated checkout modal to remove default zeros from amount fields, added payment method selection (Cash/Card/Bank Transfer), made modal wider (max-w-lg), and enhanced real-time balance calculation."
