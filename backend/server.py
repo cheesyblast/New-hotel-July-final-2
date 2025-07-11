@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +6,9 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 import uuid
-from datetime import datetime
-
+from datetime import datetime, date
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -25,32 +24,186 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-
 # Define Models
-class StatusCheck(BaseModel):
+class Room(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    room_number: str
+    room_type: str  # Suite, Double, Triple
+    status: str  # Available, Occupied, Reserved
+    current_guest: Optional[str] = None
+    check_in_date: Optional[date] = None
+    check_out_date: Optional[date] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class RoomCreate(BaseModel):
+    room_number: str
+    room_type: str
 
-# Add your routes to the router instead of directly to app
+class Booking(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    guest_name: str
+    guest_email: str
+    guest_phone: str
+    room_number: str
+    check_in_date: date
+    check_out_date: date
+    status: str  # Upcoming, Checked-in, Completed, Cancelled
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class BookingCreate(BaseModel):
+    guest_name: str
+    guest_email: str
+    guest_phone: str
+    room_number: str
+    check_in_date: date
+    check_out_date: date
+
+class Customer(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    email: str
+    phone: str
+    current_room: str
+    check_in_date: date
+    check_out_date: date
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CheckoutRequest(BaseModel):
+    customer_id: str
+
+# Room Management Routes
+@api_router.get("/rooms", response_model=List[Room])
+async def get_rooms():
+    rooms = await db.rooms.find().to_list(1000)
+    return [Room(**room) for room in rooms]
+
+@api_router.post("/rooms", response_model=Room)
+async def create_room(room: RoomCreate):
+    room_dict = room.dict()
+    room_obj = Room(**room_dict, status="Available")
+    await db.rooms.insert_one(room_obj.dict())
+    return room_obj
+
+@api_router.put("/rooms/{room_id}/status")
+async def update_room_status(room_id: str, status: str, guest_name: Optional[str] = None, check_in_date: Optional[date] = None, check_out_date: Optional[date] = None):
+    update_data = {"status": status}
+    if guest_name:
+        update_data["current_guest"] = guest_name
+    if check_in_date:
+        update_data["check_in_date"] = check_in_date
+    if check_out_date:
+        update_data["check_out_date"] = check_out_date
+    
+    result = await db.rooms.update_one({"id": room_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Room not found")
+    return {"message": "Room status updated successfully"}
+
+# Booking Management Routes
+@api_router.get("/bookings", response_model=List[Booking])
+async def get_bookings():
+    bookings = await db.bookings.find().to_list(1000)
+    return [Booking(**booking) for booking in bookings]
+
+@api_router.get("/bookings/upcoming", response_model=List[Booking])
+async def get_upcoming_bookings():
+    today = datetime.now().date()
+    bookings = await db.bookings.find({
+        "status": "Upcoming",
+        "check_in_date": {"$gte": today}
+    }).sort("check_in_date", 1).to_list(10)
+    return [Booking(**booking) for booking in bookings]
+
+@api_router.post("/bookings", response_model=Booking)
+async def create_booking(booking: BookingCreate):
+    booking_dict = booking.dict()
+    booking_obj = Booking(**booking_dict, status="Upcoming")
+    await db.bookings.insert_one(booking_obj.dict())
+    return booking_obj
+
+# Customer Management Routes
+@api_router.get("/customers/checked-in", response_model=List[Customer])
+async def get_checked_in_customers():
+    customers = await db.customers.find().to_list(1000)
+    return [Customer(**customer) for customer in customers]
+
+@api_router.post("/customers", response_model=Customer)
+async def create_customer(customer: Customer):
+    await db.customers.insert_one(customer.dict())
+    return customer
+
+@api_router.post("/checkout")
+async def checkout_customer(checkout: CheckoutRequest):
+    # Remove customer from checked-in list
+    result = await db.customers.delete_one({"id": checkout.customer_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    
+    # Update room status to available
+    customer = await db.customers.find_one({"id": checkout.customer_id})
+    if customer:
+        await db.rooms.update_one(
+            {"room_number": customer["current_room"]},
+            {"$set": {"status": "Available", "current_guest": None, "check_in_date": None, "check_out_date": None}}
+        )
+    
+    return {"message": "Customer checked out successfully"}
+
+# Initialize sample data
+@api_router.post("/init-data")
+async def initialize_sample_data():
+    # Check if data already exists
+    existing_rooms = await db.rooms.count_documents({})
+    if existing_rooms > 0:
+        return {"message": "Sample data already exists"}
+    
+    # Create sample rooms
+    sample_rooms = [
+        Room(room_number="101", room_type="Suite", status="Available"),
+        Room(room_number="102", room_type="Double", status="Occupied", current_guest="John Doe", check_in_date=date.today(), check_out_date=date(2025, 7, 15)),
+        Room(room_number="103", room_type="Double", status="Available"),
+        Room(room_number="201", room_type="Double", status="Available"),
+        Room(room_number="202", room_type="Triple", status="Available"),
+        Room(room_number="203", room_type="Double", status="Available"),
+        Room(room_number="204", room_type="Triple", status="Available"),
+        Room(room_number="205", room_type="Double", status="Reserved"),
+        Room(room_number="301", room_type="Double", status="Available"),
+        Room(room_number="302", room_type="Double", status="Available"),
+    ]
+    
+    for room in sample_rooms:
+        await db.rooms.insert_one(room.dict())
+    
+    # Create sample bookings
+    sample_bookings = [
+        Booking(guest_name="Alice Johnson", guest_email="alice@example.com", guest_phone="123-456-7890", 
+                room_number="103", check_in_date=date(2025, 7, 16), check_out_date=date(2025, 7, 20), status="Upcoming"),
+        Booking(guest_name="Bob Smith", guest_email="bob@example.com", guest_phone="098-765-4321", 
+                room_number="201", check_in_date=date(2025, 7, 18), check_out_date=date(2025, 7, 22), status="Upcoming"),
+        Booking(guest_name="Carol Davis", guest_email="carol@example.com", guest_phone="555-123-4567", 
+                room_number="301", check_in_date=date(2025, 7, 20), check_out_date=date(2025, 7, 25), status="Upcoming"),
+    ]
+    
+    for booking in sample_bookings:
+        await db.bookings.insert_one(booking.dict())
+    
+    # Create sample checked-in customers
+    sample_customers = [
+        Customer(name="John Doe", email="john@example.com", phone="111-222-3333", 
+                current_room="102", check_in_date=date.today(), check_out_date=date(2025, 7, 15)),
+        Customer(name="Jane Wilson", email="jane@example.com", phone="444-555-6666", 
+                current_room="205", check_in_date=date(2025, 7, 10), check_out_date=date(2025, 7, 14)),
+    ]
+    
+    for customer in sample_customers:
+        await db.customers.insert_one(customer.dict())
+    
+    return {"message": "Sample data initialized successfully"}
+
+# Test route
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+    return {"message": "Hotel Management API"}
 
 # Include the router in the main app
 app.include_router(api_router)
