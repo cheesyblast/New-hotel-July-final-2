@@ -207,7 +207,11 @@ async def initialize_sample_data():
     ]
     
     for customer in sample_customers:
-        await db.customers.insert_one(customer.dict())
+        customer_dict = customer.dict()
+        # Convert date objects to datetime for MongoDB compatibility
+        customer_dict['check_in_date'] = datetime.combine(customer_dict['check_in_date'], datetime.min.time())
+        customer_dict['check_out_date'] = datetime.combine(customer_dict['check_out_date'], datetime.min.time())
+        await db.customers.insert_one(customer_dict)
     
     return {"message": "Sample data initialized successfully"}
 
