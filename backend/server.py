@@ -579,6 +579,185 @@ async def get_guest_details(guest_email: str):
     
     return guest_info
 
+# Reports and Analytics Routes
+@api_router.get("/reports/daily")
+async def get_daily_reports(start_date: Optional[str] = None, end_date: Optional[str] = None):
+    # Default to last 30 days if no dates provided
+    if not start_date or not end_date:
+        end_date_obj = datetime.now().date()
+        start_date_obj = end_date_obj - timedelta(days=30)
+    else:
+        start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+    
+    daily_data = []
+    current_date = start_date_obj
+    
+    while current_date <= end_date_obj:
+        start_datetime = datetime.combine(current_date, datetime.min.time())
+        end_datetime = datetime.combine(current_date, datetime.max.time())
+        
+        # Calculate daily revenue from completed bookings
+        daily_revenue = 0
+        completed_bookings = await db.bookings.find({
+            "status": "Completed",
+            "check_out_date": {"$gte": start_datetime, "$lte": end_datetime}
+        }).to_list(1000)
+        
+        for booking in completed_bookings:
+            room = await db.rooms.find_one({"room_number": booking.get("room_number")})
+            if room:
+                daily_revenue += room.get("price_per_night", 500)
+        
+        # Calculate daily expenses
+        daily_expenses = 0
+        expenses = await db.expenses.find({
+            "expense_date": {"$gte": start_datetime, "$lte": end_datetime}
+        }).to_list(1000)
+        
+        for expense in expenses:
+            daily_expenses += expense.get("amount", 0)
+        
+        daily_profit = daily_revenue - daily_expenses
+        
+        daily_data.append({
+            "date": current_date.strftime('%Y-%m-%d'),
+            "revenue": daily_revenue,
+            "expenses": daily_expenses,
+            "profit": daily_profit,
+            "bookings_count": len(completed_bookings),
+            "expenses_count": len(expenses)
+        })
+        
+        current_date += timedelta(days=1)
+    
+    return daily_data
+
+@api_router.get("/reports/monthly")
+async def get_monthly_reports(year: Optional[int] = None):
+    if not year:
+        year = datetime.now().year
+    
+    monthly_data = []
+    
+    for month in range(1, 13):
+        start_date = datetime(year, month, 1)
+        if month == 12:
+            end_date = datetime(year + 1, 1, 1) - timedelta(days=1)
+        else:
+            end_date = datetime(year, month + 1, 1) - timedelta(days=1)
+        
+        # Calculate monthly revenue
+        monthly_revenue = 0
+        completed_bookings = await db.bookings.find({
+            "status": "Completed",
+            "check_out_date": {"$gte": start_date, "$lte": end_date}
+        }).to_list(1000)
+        
+        for booking in completed_bookings:
+            room = await db.rooms.find_one({"room_number": booking.get("room_number")})
+            if room:
+                monthly_revenue += room.get("price_per_night", 500)
+        
+        # Calculate monthly expenses
+        monthly_expenses = 0
+        expenses = await db.expenses.find({
+            "expense_date": {"$gte": start_date, "$lte": end_date}
+        }).to_list(1000)
+        
+        for expense in expenses:
+            monthly_expenses += expense.get("amount", 0)
+        
+        monthly_profit = monthly_revenue - monthly_expenses
+        
+        # Calculate occupancy rate
+        total_rooms = await db.rooms.count_documents({})
+        occupied_days = len(completed_bookings)
+        days_in_month = (end_date - start_date).days + 1
+        occupancy_rate = (occupied_days / (total_rooms * days_in_month)) * 100 if total_rooms > 0 else 0
+        
+        monthly_data.append({
+            "month": month,
+            "month_name": start_date.strftime('%B'),
+            "revenue": monthly_revenue,
+            "expenses": monthly_expenses,
+            "profit": monthly_profit,
+            "bookings_count": len(completed_bookings),
+            "occupancy_rate": round(occupancy_rate, 2)
+        })
+    
+    return monthly_data
+
+@api_router.get("/reports/comparison")
+async def get_month_comparison():
+    current_date = datetime.now()
+    current_month_start = datetime(current_date.year, current_date.month, 1)
+    
+    # Last month calculation
+    if current_date.month == 1:
+        last_month_start = datetime(current_date.year - 1, 12, 1)
+        last_month_end = datetime(current_date.year, 1, 1) - timedelta(days=1)
+    else:
+        last_month_start = datetime(current_date.year, current_date.month - 1, 1)
+        last_month_end = datetime(current_date.year, current_date.month, 1) - timedelta(days=1)
+    
+    current_month_end = current_date
+    
+    async def get_month_data(start_date, end_date, label):
+        # Revenue calculation
+        revenue = 0
+        completed_bookings = await db.bookings.find({
+            "status": "Completed",
+            "check_out_date": {"$gte": start_date, "$lte": end_date}
+        }).to_list(1000)
+        
+        for booking in completed_bookings:
+            room = await db.rooms.find_one({"room_number": booking.get("room_number")})
+            if room:
+                revenue += room.get("price_per_night", 500)
+        
+        # Expenses calculation
+        expenses = 0
+        expense_records = await db.expenses.find({
+            "expense_date": {"$gte": start_date, "$lte": end_date}
+        }).to_list(1000)
+        
+        for expense in expense_records:
+            expenses += expense.get("amount", 0)
+        
+        profit = revenue - expenses
+        
+        return {
+            "period": label,
+            "revenue": revenue,
+            "expenses": expenses,
+            "profit": profit,
+            "bookings_count": len(completed_bookings),
+            "expenses_count": len(expense_records)
+        }
+    
+    last_month_data = await get_month_data(last_month_start, last_month_end, "Last Month")
+    current_month_data = await get_month_data(current_month_start, current_month_end, "Current Month")
+    
+    # Calculate percentage changes
+    def calculate_change(current, previous):
+        if previous == 0:
+            return 100 if current > 0 else 0
+        return round(((current - previous) / previous) * 100, 2)
+    
+    comparison = {
+        "last_month": last_month_data,
+        "current_month": current_month_data,
+        "changes": {
+            "revenue_change": calculate_change(current_month_data["revenue"], last_month_data["revenue"]),
+            "expenses_change": calculate_change(current_month_data["expenses"], last_month_data["expenses"]),
+            "profit_change": calculate_change(current_month_data["profit"], last_month_data["profit"]),
+            "bookings_change": calculate_change(current_month_data["bookings_count"], last_month_data["bookings_count"])
+        }
+    }
+    
+    return comparison
+
 # Expense Management Routes
 @api_router.get("/expenses", response_model=List[Expense])
 async def get_expenses():
