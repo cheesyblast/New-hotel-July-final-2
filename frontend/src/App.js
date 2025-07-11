@@ -27,7 +27,8 @@ const Dashboard = () => {
     notes: ''
   });
   const [checkoutData, setCheckoutData] = useState({
-    additional_amount: 0
+    additional_amount: 0,
+    discount_amount: 0
   });
   const [newBookingData, setNewBookingData] = useState({
     guest_name: '',
