@@ -99,6 +99,7 @@ class Customer(BaseModel):
 class CheckoutRequest(BaseModel):
     customer_id: str
     additional_amount: float = 0.0
+    discount_amount: float = 0.0
 
 class CheckinRequest(BaseModel):
     booking_id: str
