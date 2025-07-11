@@ -204,9 +204,6 @@ function App() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-500">Welcome, Admin</span>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
-                + New Booking
-              </button>
             </div>
           </div>
         </div>
