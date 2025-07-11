@@ -221,7 +221,7 @@ const Dashboard = () => {
         check_in_date: '',
         check_out_date: '',
         stay_type: 'Night Stay',
-        booking_amount: 0,
+        booking_amount: '',
         additional_notes: ''
       });
       
