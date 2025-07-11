@@ -100,6 +100,20 @@ class CheckoutRequest(BaseModel):
     customer_id: str
     additional_amount: float = 0.0
     discount_amount: float = 0.0
+    payment_method: str = "Cash"  # Cash, Card, Bank Transfer
+
+class DailySale(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    date: date
+    customer_name: str
+    room_number: str
+    room_charges: float
+    additional_charges: float
+    discount_amount: float
+    advance_amount: float
+    total_amount: float
+    payment_method: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class CheckinRequest(BaseModel):
     booking_id: str
