@@ -34,11 +34,18 @@ class Room(BaseModel):
     current_guest: Optional[str] = None
     check_in_date: Optional[date] = None
     check_out_date: Optional[date] = None
+    price_per_night: float = 0.0
+    max_occupancy: int = 2
+    amenities: List[str] = []
+    image_url: str = "https://images.unsplash.com/photo-1568495248636-6432b97bd949?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxob3RlbCUyMHJvb218ZW58MHx8fHwxNzUyMjU1NjAxfDA&ixlib=rb-4.1.0&q=85"
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class RoomCreate(BaseModel):
     room_number: str
     room_type: str
+    price_per_night: float
+    max_occupancy: int = 2
+    amenities: List[str] = []
 
 class Booking(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
