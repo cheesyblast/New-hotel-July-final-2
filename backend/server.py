@@ -76,6 +76,14 @@ class CheckoutRequest(BaseModel):
 @api_router.get("/rooms", response_model=List[Room])
 async def get_rooms():
     rooms = await db.rooms.find().to_list(1000)
+    
+    # Convert datetime back to date for response
+    for room in rooms:
+        if isinstance(room.get('check_in_date'), datetime):
+            room['check_in_date'] = room['check_in_date'].date()
+        if isinstance(room.get('check_out_date'), datetime):
+            room['check_out_date'] = room['check_out_date'].date()
+    
     return [Room(**room) for room in rooms]
 
 @api_router.post("/rooms", response_model=Room)
