@@ -748,10 +748,25 @@ const Dashboard = () => {
                     <option value="">Select a room</option>
                     {getAvailableRooms().map((room) => (
                       <option key={room.id} value={room.room_number}>
-                        {room.room_number} - {room.room_type} (${room.price_per_night}/night)
+                        {room.room_number} - {room.room_type}
                       </option>
                     ))}
                   </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Booking Amount *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={newBookingData.booking_amount}
+                    onChange={(e) => setNewBookingData({...newBookingData, booking_amount: parseFloat(e.target.value) || 0})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter booking amount"
+                    required
+                  />
                 </div>
                 
                 <div>
