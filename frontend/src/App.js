@@ -749,6 +749,26 @@ const Dashboard = () => {
                   </select>
                 </div>
                 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Stay Type *
+                  </label>
+                  <select
+                    value={newBookingData.stay_type}
+                    onChange={(e) => setNewBookingData({...newBookingData, stay_type: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="Night Stay">Night Stay</option>
+                    <option value="Short Time">Short Time</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {newBookingData.stay_type === 'Short Time' 
+                      ? 'Customer will checkout on the same day' 
+                      : 'Customer will stay overnight'}
+                  </p>
+                </div>
+                
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -763,18 +783,34 @@ const Dashboard = () => {
                     />
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Check-out Date *
-                    </label>
-                    <input
-                      type="date"
-                      value={newBookingData.check_out_date}
-                      onChange={(e) => setNewBookingData({...newBookingData, check_out_date: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
+                  {newBookingData.stay_type === 'Night Stay' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Check-out Date *
+                      </label>
+                      <input
+                        type="date"
+                        value={newBookingData.check_out_date}
+                        onChange={(e) => setNewBookingData({...newBookingData, check_out_date: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required={newBookingData.stay_type === 'Night Stay'}
+                      />
+                    </div>
+                  )}
+                  
+                  {newBookingData.stay_type === 'Short Time' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Check-out Date
+                      </label>
+                      <input
+                        type="text"
+                        value="Same day checkout"
+                        disabled
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
+                      />
+                    </div>
+                  )}
                 </div>
                 
                 <div>
