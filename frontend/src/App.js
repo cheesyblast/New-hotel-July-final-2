@@ -189,7 +189,7 @@ const Dashboard = () => {
       }
 
       // Booking amount is required
-      if (!newBookingData.booking_amount || newBookingData.booking_amount <= 0) {
+      if (!newBookingData.booking_amount || parseFloat(newBookingData.booking_amount) <= 0) {
         missingFields.push('booking_amount');
       }
       
