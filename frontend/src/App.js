@@ -1824,6 +1824,7 @@ function App() {
             <Route path="/rooms" element={<Rooms />} />
             <Route path="/guests" element={<Guests />} />
             <Route path="/bookings" element={<Bookings />} />
+            <Route path="/expenses" element={<Expenses />} />
           </Routes>
         </main>
       </BrowserRouter>
