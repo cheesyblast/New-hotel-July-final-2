@@ -2432,6 +2432,7 @@ function App() {
             <Route path="/guests" element={<Guests />} />
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/expenses" element={<Expenses />} />
+            <Route path="/reports" element={<Reports />} />
           </Routes>
         </main>
       </BrowserRouter>
