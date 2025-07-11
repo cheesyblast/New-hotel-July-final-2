@@ -332,7 +332,7 @@ function App() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => handleCheckin(booking.id)}
+                              onClick={() => handleCheckin(booking)}
                               className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors"
                             >
                               Check In
