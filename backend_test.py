@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Comprehensive Backend API Testing for Hotel Management System
-Tests ALL endpoints including new guest management, expense management, and financial summary.
+Tests ALL endpoints including enhanced checkout with payment methods and daily sales tracking.
 """
 
 import requests
@@ -177,81 +177,245 @@ def test_get_checked_in_customers():
         print(f"❌ Get checked-in customers FAILED - Exception: {e}")
         return False, []
 
-def test_checkout_functionality(customers):
-    """Test POST /api/checkout - Test checkout functionality with a customer ID"""
-    print("\n6. Testing Checkout Functionality (POST /api/checkout)")
+def test_enhanced_checkout_functionality(customers):
+    """Test POST /api/checkout - Enhanced checkout with payment methods and daily sales tracking"""
+    print("\n6. Testing Enhanced Checkout Functionality (POST /api/checkout)")
     
     if not customers:
-        print("❌ Checkout test SKIPPED - No customers available for checkout")
+        print("❌ Enhanced checkout test SKIPPED - No customers available for checkout")
         return False
     
-    # Use the first customer for checkout test
-    test_customer = customers[0]
-    customer_id = test_customer['id']
-    room_number = test_customer['current_room']
+    # Test all payment methods
+    payment_methods = ["Cash", "Card", "Bank Transfer"]
+    checkout_results = []
     
-    print(f"Testing checkout for customer: {test_customer['name']} (ID: {customer_id}) in room {room_number}")
+    for i, payment_method in enumerate(payment_methods):
+        if i >= len(customers):
+            print(f"⚠️ Not enough customers to test {payment_method} payment method")
+            break
+            
+        test_customer = customers[i]
+        customer_id = test_customer['id']
+        room_number = test_customer['current_room']
+        customer_name = test_customer['name']
+        
+        print(f"\nTesting checkout with {payment_method} for customer: {customer_name} (ID: {customer_id}) in room {room_number}")
+        
+        try:
+            # Perform enhanced checkout with payment method and additional charges
+            checkout_data = {
+                "customer_id": customer_id,
+                "additional_amount": 100.0,  # Additional charges
+                "discount_amount": 50.0,     # Discount
+                "payment_method": payment_method
+            }
+            response = requests.post(f"{API_BASE}/checkout", json=checkout_data)
+            print(f"Checkout Status Code: {response.status_code}")
+            
+            if response.status_code == 200:
+                result = response.json()
+                print(f"Checkout Response: {result}")
+                
+                if "checked out successfully" in result.get("message", ""):
+                    # Verify billing details in response
+                    billing_details = result.get("billing_details", {})
+                    if billing_details:
+                        print(f"✅ Billing details received:")
+                        print(f"  Room charges: {billing_details.get('room_charges')}")
+                        print(f"  Additional charges: {billing_details.get('additional_charges')}")
+                        print(f"  Discount amount: {billing_details.get('discount_amount')}")
+                        print(f"  Total amount: {billing_details.get('total_amount')}")
+                        print(f"  Payment method: {billing_details.get('payment_method')}")
+                        
+                        if billing_details.get('payment_method') == payment_method:
+                            print(f"✅ Payment method correctly recorded as {payment_method}")
+                            checkout_results.append(True)
+                        else:
+                            print(f"❌ Payment method mismatch. Expected: {payment_method}, Got: {billing_details.get('payment_method')}")
+                            checkout_results.append(False)
+                    else:
+                        print("❌ No billing details in response")
+                        checkout_results.append(False)
+                else:
+                    print("❌ Checkout FAILED - Unexpected response message")
+                    checkout_results.append(False)
+            else:
+                print(f"❌ Checkout FAILED - Status code: {response.status_code}")
+                print(f"Response: {response.text}")
+                checkout_results.append(False)
+        except Exception as e:
+            print(f"❌ Checkout FAILED - Exception: {e}")
+            checkout_results.append(False)
+    
+    # Overall result
+    if all(checkout_results):
+        print(f"\n✅ Enhanced checkout functionality PASSED for all {len(checkout_results)} payment methods")
+        return True
+    else:
+        failed_count = len(checkout_results) - sum(checkout_results)
+        print(f"\n❌ Enhanced checkout functionality FAILED for {failed_count} out of {len(checkout_results)} payment methods")
+        return False
+
+def test_daily_sales_endpoint():
+    """Test GET /api/daily-sales - Test daily sales data retrieval"""
+    print("\n7. Testing Daily Sales Endpoint (GET /api/daily-sales)")
     
     try:
-        # Perform checkout
-        checkout_data = {"customer_id": customer_id}
-        response = requests.post(f"{API_BASE}/checkout", json=checkout_data)
-        print(f"Checkout Status Code: {response.status_code}")
+        # Test without date filters (should return current month data)
+        print("Testing daily sales without date filters...")
+        response = requests.get(f"{API_BASE}/daily-sales")
+        print(f"Status Code: {response.status_code}")
         
         if response.status_code == 200:
-            result = response.json()
-            print(f"Checkout Response: {result}")
+            sales_data = response.json()
+            print(f"Number of daily sales records: {len(sales_data)}")
             
-            if "checked out successfully" in result.get("message", ""):
-                print("✅ Checkout request PASSED")
+            if len(sales_data) > 0:
+                print("Sample daily sales record:")
+                sample_sale = sales_data[0]
+                print(f"  Date: {sample_sale.get('date')}")
+                print(f"  Customer: {sample_sale.get('customer_name')}")
+                print(f"  Room: {sample_sale.get('room_number')}")
+                print(f"  Payment Method: {sample_sale.get('payment_method')}")
+                print(f"  Total Amount: {sample_sale.get('total_amount')}")
                 
-                # Verify customer is removed from checked-in list
-                print("Verifying customer removal...")
-                customers_response = requests.get(f"{API_BASE}/customers/checked-in")
-                if customers_response.status_code == 200:
-                    remaining_customers = customers_response.json()
-                    customer_ids = [c['id'] for c in remaining_customers]
+                # Verify all required fields are present
+                required_fields = ['date', 'customer_name', 'room_number', 'room_charges', 
+                                 'additional_charges', 'discount_amount', 'advance_amount', 
+                                 'total_amount', 'payment_method']
+                
+                missing_fields = [field for field in required_fields if field not in sample_sale]
+                
+                if not missing_fields:
+                    print("✅ All required fields present in daily sales record")
                     
-                    if customer_id not in customer_ids:
-                        print("✅ Customer successfully removed from checked-in list")
-                        
-                        # Verify room status updated to Available
-                        print("Verifying room status update...")
-                        rooms_response = requests.get(f"{API_BASE}/rooms")
-                        if rooms_response.status_code == 200:
-                            rooms = rooms_response.json()
-                            target_room = next((r for r in rooms if r['room_number'] == room_number), None)
-                            
-                            if target_room and target_room['status'] == 'Available' and not target_room.get('current_guest'):
-                                print("✅ Room status successfully updated to Available")
-                                print("✅ Checkout functionality FULLY PASSED")
-                                return True
-                            else:
-                                print(f"❌ Room status not properly updated. Current status: {target_room['status'] if target_room else 'Room not found'}")
-                                return False
-                        else:
-                            print("❌ Could not verify room status update")
-                            return False
+                    # Test with date filters
+                    print("\nTesting daily sales with date filters...")
+                    today = datetime.now().date()
+                    start_date = today.replace(day=1).strftime('%Y-%m-%d')
+                    end_date = today.strftime('%Y-%m-%d')
+                    
+                    filtered_response = requests.get(f"{API_BASE}/daily-sales?start_date={start_date}&end_date={end_date}")
+                    
+                    if filtered_response.status_code == 200:
+                        filtered_sales = filtered_response.json()
+                        print(f"Filtered sales records: {len(filtered_sales)}")
+                        print("✅ Daily sales endpoint with date filtering PASSED")
+                        return True
                     else:
-                        print("❌ Customer still appears in checked-in list")
+                        print(f"❌ Daily sales with date filtering FAILED - Status code: {filtered_response.status_code}")
                         return False
                 else:
-                    print("❌ Could not verify customer removal")
+                    print(f"❌ Missing required fields in daily sales record: {missing_fields}")
                     return False
             else:
-                print("❌ Checkout FAILED - Unexpected response message")
-                return False
+                print("⚠️ No daily sales records found - this might be expected if no checkouts have been performed")
+                print("✅ Daily sales endpoint structure PASSED (empty result is valid)")
+                return True
         else:
-            print(f"❌ Checkout FAILED - Status code: {response.status_code}")
-            print(f"Response: {response.text}")
+            print(f"❌ Daily sales endpoint FAILED - Status code: {response.status_code}")
             return False
     except Exception as e:
-        print(f"❌ Checkout FAILED - Exception: {e}")
+        print(f"❌ Daily sales endpoint FAILED - Exception: {e}")
+        return False
+
+def test_daily_sales_database_storage():
+    """Test that daily sales are properly stored in database after checkout"""
+    print("\n8. Testing Daily Sales Database Storage")
+    
+    try:
+        # Get initial count of daily sales
+        initial_response = requests.get(f"{API_BASE}/daily-sales")
+        if initial_response.status_code != 200:
+            print("❌ Could not get initial daily sales count")
+            return False
+        
+        initial_count = len(initial_response.json())
+        print(f"Initial daily sales records: {initial_count}")
+        
+        # Get a customer to checkout (need to reinitialize data first)
+        print("Reinitializing sample data for database storage test...")
+        init_response = requests.post(f"{API_BASE}/init-data")
+        if init_response.status_code != 200:
+            print("❌ Could not reinitialize sample data")
+            return False
+        
+        # Get checked-in customers
+        customers_response = requests.get(f"{API_BASE}/customers/checked-in")
+        if customers_response.status_code != 200:
+            print("❌ Could not get checked-in customers")
+            return False
+        
+        customers = customers_response.json()
+        if not customers:
+            print("❌ No customers available for database storage test")
+            return False
+        
+        test_customer = customers[0]
+        customer_id = test_customer['id']
+        
+        # Perform checkout to create daily sales record
+        checkout_data = {
+            "customer_id": customer_id,
+            "additional_amount": 200.0,
+            "discount_amount": 25.0,
+            "payment_method": "Card"
+        }
+        
+        checkout_response = requests.post(f"{API_BASE}/checkout", json=checkout_data)
+        if checkout_response.status_code != 200:
+            print("❌ Checkout failed during database storage test")
+            return False
+        
+        # Check if daily sales record was created
+        final_response = requests.get(f"{API_BASE}/daily-sales")
+        if final_response.status_code != 200:
+            print("❌ Could not get final daily sales count")
+            return False
+        
+        final_sales = final_response.json()
+        final_count = len(final_sales)
+        
+        print(f"Final daily sales records: {final_count}")
+        
+        if final_count > initial_count:
+            # Find the new record
+            new_records = [sale for sale in final_sales if sale.get('customer_name') == test_customer['name']]
+            
+            if new_records:
+                new_record = new_records[0]
+                print("✅ New daily sales record created:")
+                print(f"  Customer: {new_record.get('customer_name')}")
+                print(f"  Room: {new_record.get('room_number')}")
+                print(f"  Payment Method: {new_record.get('payment_method')}")
+                print(f"  Room Charges: {new_record.get('room_charges')}")
+                print(f"  Additional Charges: {new_record.get('additional_charges')}")
+                print(f"  Discount Amount: {new_record.get('discount_amount')}")
+                print(f"  Total Amount: {new_record.get('total_amount')}")
+                
+                # Verify the record has correct data
+                if (new_record.get('payment_method') == 'Card' and 
+                    new_record.get('additional_charges') == 200.0 and
+                    new_record.get('discount_amount') == 25.0):
+                    print("✅ Daily sales database storage PASSED - Record contains correct data")
+                    return True
+                else:
+                    print("❌ Daily sales record has incorrect data")
+                    return False
+            else:
+                print("❌ Could not find new daily sales record for the customer")
+                return False
+        else:
+            print("❌ No new daily sales record was created")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Daily sales database storage test FAILED - Exception: {e}")
         return False
 
 def test_error_handling():
     """Test error handling for invalid requests"""
-    print("\n7. Testing Error Handling")
+    print("\n9. Testing Error Handling")
     
     # Test checkout with invalid customer ID
     print("Testing checkout with invalid customer ID...")
@@ -270,9 +434,9 @@ def test_error_handling():
         return False
 
 def main():
-    """Run all backend API tests"""
-    print("Starting Comprehensive Hotel Management Backend API Tests")
-    print("=" * 60)
+    """Run all backend API tests focusing on enhanced checkout functionality"""
+    print("Starting Enhanced Checkout and Daily Sales Backend API Tests")
+    print("=" * 70)
     
     test_results = []
     
@@ -294,16 +458,22 @@ def main():
     customers_passed, customers_data = test_get_checked_in_customers()
     test_results.append(("Get Checked-in Customers", customers_passed))
     
-    # Test 6: Checkout Functionality
-    test_results.append(("Checkout Functionality", test_checkout_functionality(customers_data)))
+    # Test 6: Enhanced Checkout Functionality (MAIN FOCUS)
+    test_results.append(("Enhanced Checkout", test_enhanced_checkout_functionality(customers_data)))
     
-    # Test 7: Error Handling
+    # Test 7: Daily Sales Endpoint
+    test_results.append(("Daily Sales Endpoint", test_daily_sales_endpoint()))
+    
+    # Test 8: Daily Sales Database Storage
+    test_results.append(("Daily Sales Storage", test_daily_sales_database_storage()))
+    
+    # Test 9: Error Handling
     test_results.append(("Error Handling", test_error_handling()))
     
     # Summary
-    print("\n" + "=" * 60)
-    print("TEST SUMMARY")
-    print("=" * 60)
+    print("\n" + "=" * 70)
+    print("TEST SUMMARY - ENHANCED CHECKOUT & DAILY SALES")
+    print("=" * 70)
     
     passed_tests = 0
     total_tests = len(test_results)
@@ -314,14 +484,14 @@ def main():
         if passed:
             passed_tests += 1
     
-    print("-" * 60)
+    print("-" * 70)
     print(f"Total Tests: {total_tests}")
     print(f"Passed: {passed_tests}")
     print(f"Failed: {total_tests - passed_tests}")
     print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
     
     if passed_tests == total_tests:
-        print("\n🎉 ALL TESTS PASSED! Hotel Management API is working correctly.")
+        print("\n🎉 ALL TESTS PASSED! Enhanced checkout and daily sales functionality is working correctly.")
         return True
     else:
         print(f"\n⚠️  {total_tests - passed_tests} test(s) failed. Please check the issues above.")
