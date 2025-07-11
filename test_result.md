@@ -197,9 +197,9 @@ frontend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Implemented room status cards with color coding, room details, and guest information display"
+        comment: "Dashboard shows room cards with color coding and status indicators. Fixed duplicate navigation issue."
 
-  - task: "Hotel Dashboard - Upcoming Bookings Section"
+  - task: "Hotel Dashboard - Booking Management with Modals"
     implemented: true
     working: "NA"
     file: "/app/frontend/src/App.js"
@@ -209,9 +209,9 @@ frontend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Implemented upcoming bookings table with guest details and booking information"
+        comment: "Implemented check-in, checkout, and new booking modals with validation and real-time calculations."
 
-  - task: "Hotel Dashboard - Checked-in Customers with Checkout"
+  - task: "Rooms Management Page"
     implemented: true
     working: "NA"
     file: "/app/frontend/src/App.js"
@@ -221,7 +221,55 @@ frontend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Implemented checked-in customers table with working checkout button functionality"
+        comment: "Room cards layout with add/edit/delete functionality, pricing, and amenities management."
+
+  - task: "Guests Management Page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Guest list with statistics and detailed booking history modal."
+
+  - task: "Bookings Management Page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Complete bookings list with status indicators and comprehensive booking information."
+
+  - task: "Expenses and Profit Management Page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Financial dashboard with expense tracking, profit/loss calculations, and category management."
+
+  - task: "Navigation and Routing"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "React Router navigation between Dashboard, Rooms, Guests, Bookings, and Expenses pages."
 
 metadata:
   created_by: "main_agent"
