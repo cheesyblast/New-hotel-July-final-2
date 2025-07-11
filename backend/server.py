@@ -173,7 +173,13 @@ async def initialize_sample_data():
     ]
     
     for room in sample_rooms:
-        await db.rooms.insert_one(room.dict())
+        room_dict = room.dict()
+        # Convert date objects to datetime for MongoDB compatibility
+        if room_dict.get('check_in_date'):
+            room_dict['check_in_date'] = datetime.combine(room_dict['check_in_date'], datetime.min.time())
+        if room_dict.get('check_out_date'):
+            room_dict['check_out_date'] = datetime.combine(room_dict['check_out_date'], datetime.min.time())
+        await db.rooms.insert_one(room_dict)
     
     # Create sample bookings
     sample_bookings = [
