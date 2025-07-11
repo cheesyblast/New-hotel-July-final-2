@@ -859,10 +859,10 @@ const Dashboard = () => {
                 onClick={handleNewBooking}
                 disabled={
                   !newBookingData.guest_name || 
-                  !newBookingData.guest_email || 
-                  !newBookingData.guest_phone || 
                   !newBookingData.room_number || 
                   !newBookingData.check_in_date ||
+                  !newBookingData.booking_amount ||
+                  newBookingData.booking_amount <= 0 ||
                   (newBookingData.stay_type === 'Night Stay' && !newBookingData.check_out_date)
                 }
                 className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
