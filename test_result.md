@@ -182,12 +182,15 @@ backend:
 
   - task: "Hotel Management API - Financial Summary"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
+      - working: true
+        agent: "testing"
+        comment: "PASSED - Financial summary endpoint working perfectly. GET /api/financial-summary returns comprehensive profit/loss calculations with total revenue ($0), total expenses ($32,800), net profit (-$32,800), detailed revenue breakdown by room type, and expense breakdown by category (Staff: $25,000, Food: $3,500, Marketing: $2,000, Utilities: $1,500, Maintenance: $800). Date filtering and calculations working correctly."
       - working: "NA"
         agent: "main"
         comment: "Implemented profit/loss calculations with revenue from bookings and expense tracking by category."
