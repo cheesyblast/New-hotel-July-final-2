@@ -229,6 +229,27 @@ async def create_booking(booking: BookingCreate):
     await db.bookings.insert_one(booking_storage)
     return booking_obj
 
+@api_router.put("/bookings/{booking_id}")
+async def update_booking(booking_id: str, booking_update: BookingUpdate):
+    update_data = {}
+    
+    # Only update fields that are provided
+    if booking_update.check_in_date is not None:
+        update_data['check_in_date'] = datetime.combine(booking_update.check_in_date, datetime.min.time())
+    if booking_update.check_out_date is not None:
+        update_data['check_out_date'] = datetime.combine(booking_update.check_out_date, datetime.min.time())
+    if booking_update.additional_notes is not None:
+        update_data['additional_notes'] = booking_update.additional_notes
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields provided for update")
+    
+    result = await db.bookings.update_one({"id": booking_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    return {"message": "Booking updated successfully"}
+
 # Customer Management Routes
 @api_router.get("/customers/checked-in", response_model=List[Customer])
 async def get_checked_in_customers():
