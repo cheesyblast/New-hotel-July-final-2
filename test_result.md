@@ -105,6 +105,18 @@
 user_problem_statement: Build a comprehensive hotel management system with dashboard, rooms management, guest tracking, bookings, and expense/profit management
 
 backend:
+  - task: "Enhanced Checkout with Payment Methods and Daily Sales"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Enhanced checkout endpoint to record daily sales in database with payment method tracking. Added /api/daily-sales endpoint to retrieve sales data."
+
   - task: "Hotel Management API - Room Management"
     implemented: true
     working: true
