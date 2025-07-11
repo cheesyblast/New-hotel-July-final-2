@@ -74,6 +74,39 @@ function App() {
     }
   };
 
+  const handleCheckin = async (bookingId) => {
+    try {
+      await axios.post(`${API}/checkin/${bookingId}`);
+      
+      // Refresh all data after check-in
+      await Promise.all([
+        fetchRooms(),
+        fetchUpcomingBookings(),
+        fetchCheckedInCustomers()
+      ]);
+    } catch (error) {
+      console.error('Error during check-in:', error);
+      alert('Error during check-in. Please ensure the room is available.');
+    }
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    if (window.confirm('Are you sure you want to cancel this booking?')) {
+      try {
+        await axios.post(`${API}/cancel/${bookingId}`);
+        
+        // Refresh data after cancellation
+        await Promise.all([
+          fetchRooms(),
+          fetchUpcomingBookings()
+        ]);
+      } catch (error) {
+        console.error('Error cancelling booking:', error);
+        alert('Error cancelling booking. Please try again.');
+      }
+    }
+  };
+
   const getRoomStatusColor = (status) => {
     switch (status) {
       case 'Available':
