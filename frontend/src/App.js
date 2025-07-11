@@ -177,8 +177,8 @@ const Dashboard = () => {
     if (!selectedCustomer) return 0;
     const roomCharges = selectedCustomer.room_charges || 500;
     const advanceAmount = selectedCustomer.advance_amount || 0;
-    const additionalAmount = checkoutData.additional_amount || 0;
-    const discountAmount = checkoutData.discount_amount || 0;
+    const additionalAmount = parseFloat(checkoutData.additional_amount) || 0;
+    const discountAmount = parseFloat(checkoutData.discount_amount) || 0;
     return roomCharges + additionalAmount - advanceAmount - discountAmount;
   };
 
