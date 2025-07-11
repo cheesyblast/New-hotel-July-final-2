@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [showCheckinModal, setShowCheckinModal] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [showNewBookingModal, setShowNewBookingModal] = useState(false);
+  const [showEditBookingModal, setShowEditBookingModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   
@@ -32,9 +33,17 @@ const Dashboard = () => {
     guest_name: '',
     guest_email: '',
     guest_phone: '',
+    guest_id_passport: '',
+    guest_country: '',
     room_number: '',
     check_in_date: '',
-    check_out_date: ''
+    check_out_date: '',
+    additional_notes: ''
+  });
+  const [editBookingData, setEditBookingData] = useState({
+    check_in_date: '',
+    check_out_date: '',
+    additional_notes: ''
   });
 
   useEffect(() => {
