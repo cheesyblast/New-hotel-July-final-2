@@ -291,13 +291,15 @@ async def checkout_customer(checkout: CheckoutRequest):
     base_room_charges = customer.get('room_charges', 500.0)  # Default room charge
     advance_amount = customer.get('advance_amount', 0.0)
     additional_amount = checkout.additional_amount
-    total_amount = base_room_charges + additional_amount - advance_amount
+    discount_amount = checkout.discount_amount
+    total_amount = base_room_charges + additional_amount - advance_amount - discount_amount
     
     # Update customer with final billing details
     await db.customers.update_one(
         {"id": checkout.customer_id},
         {"$set": {
             "additional_charges": additional_amount,
+            "discount_amount": discount_amount,
             "total_amount": total_amount
         }}
     )
@@ -319,6 +321,7 @@ async def checkout_customer(checkout: CheckoutRequest):
             "room_charges": base_room_charges,
             "advance_amount": advance_amount,
             "additional_charges": additional_amount,
+            "discount_amount": discount_amount,
             "total_amount": total_amount
         }
     }
