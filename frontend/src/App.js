@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
 import axios from "axios";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-function App() {
+// Dashboard Component
+const Dashboard = () => {
   const [rooms, setRooms] = useState([]);
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [checkedInCustomers, setCheckedInCustomers] = useState([]);
