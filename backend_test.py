@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Comprehensive Backend API Testing for Hotel Management System
-Tests all endpoints and functionality as specified in the review request.
+Tests ALL endpoints including new guest management, expense management, and financial summary.
 """
 
 import requests
@@ -29,7 +29,7 @@ if not BASE_URL:
 API_BASE = f"{BASE_URL}/api"
 
 print(f"Testing Hotel Management API at: {API_BASE}")
-print("=" * 60)
+print("=" * 80)
 
 def test_health_check():
     """Test GET /api/ - Basic health check"""
