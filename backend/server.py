@@ -142,6 +142,14 @@ async def create_booking(booking: BookingCreate):
 @api_router.get("/customers/checked-in", response_model=List[Customer])
 async def get_checked_in_customers():
     customers = await db.customers.find().to_list(1000)
+    
+    # Convert datetime back to date for response
+    for customer in customers:
+        if isinstance(customer.get('check_in_date'), datetime):
+            customer['check_in_date'] = customer['check_in_date'].date()
+        if isinstance(customer.get('check_out_date'), datetime):
+            customer['check_out_date'] = customer['check_out_date'].date()
+    
     return [Customer(**customer) for customer in customers]
 
 @api_router.post("/customers", response_model=Customer)
