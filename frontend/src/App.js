@@ -592,7 +592,7 @@ const Dashboard = () => {
       {/* Checkout Modal */}
       {showCheckoutModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white rounded-lg p-6 w-full max-w-lg">
             <h3 className="text-lg font-semibold mb-4">Checkout Customer</h3>
             {selectedCustomer && (
               <div className="mb-4">
@@ -616,11 +616,11 @@ const Dashboard = () => {
                   </div>
                   <div className="flex justify-between">
                     <span>Additional Charges:</span>
-                    <span>${checkoutData.additional_amount}</span>
+                    <span>${parseFloat(checkoutData.additional_amount) || 0}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Discount:</span>
-                    <span>-${checkoutData.discount_amount}</span>
+                    <span>-${parseFloat(checkoutData.discount_amount) || 0}</span>
                   </div>
                   <hr className="my-2" />
                   <div className="flex justify-between font-semibold">
@@ -637,7 +637,7 @@ const Dashboard = () => {
                 <input
                   type="number"
                   value={checkoutData.additional_amount}
-                  onChange={(e) => setCheckoutData({...checkoutData, additional_amount: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setCheckoutData({...checkoutData, additional_amount: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="0.00"
                 />
@@ -650,10 +650,25 @@ const Dashboard = () => {
                 <input
                   type="number"
                   value={checkoutData.discount_amount}
-                  onChange={(e) => setCheckoutData({...checkoutData, discount_amount: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => setCheckoutData({...checkoutData, discount_amount: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="0.00"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Payment Method
+                </label>
+                <select
+                  value={checkoutData.payment_method}
+                  onChange={(e) => setCheckoutData({...checkoutData, payment_method: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="Cash">Cash</option>
+                  <option value="Card">Card</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
+                </select>
               </div>
 
               {/* Balance Payable - Real-time Display */}
