@@ -167,12 +167,15 @@ backend:
 
   - task: "Hotel Management API - Expense Management"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
+      - working: true
+        agent: "testing"
+        comment: "PASSED - Expense management fully functional. GET /api/expenses returns all expenses with proper date handling. POST /api/expenses creates new expenses correctly with date conversion. DELETE /api/expenses/{id} removes expenses successfully. All CRUD operations working with proper MongoDB date storage."
       - working: "NA"
         agent: "main"
         comment: "Implemented complete expense tracking with categories, CRUD operations, and financial summary calculations."
