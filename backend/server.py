@@ -750,17 +750,14 @@ async def get_month_comparison():
     current_month_end = current_date
     
     async def get_month_data(start_date, end_date, label):
-        # Revenue calculation
+        # Revenue calculation from actual daily sales (payment collected)
         revenue = 0
-        completed_bookings = await db.bookings.find({
-            "status": "Completed",
-            "check_out_date": {"$gte": start_date, "$lte": end_date}
+        daily_sales = await db.daily_sales.find({
+            "date": {"$gte": start_date, "$lte": end_date}
         }).to_list(1000)
         
-        for booking in completed_bookings:
-            room = await db.rooms.find_one({"room_number": booking.get("room_number")})
-            if room:
-                revenue += room.get("price_per_night", 500)
+        for sale in daily_sales:
+            revenue += sale.get("total_amount", 0)
         
         # Expenses calculation
         expenses = 0
@@ -778,7 +775,7 @@ async def get_month_comparison():
             "revenue": revenue,
             "expenses": expenses,
             "profit": profit,
-            "bookings_count": len(completed_bookings),
+            "sales_count": len(daily_sales),
             "expenses_count": len(expense_records)
         }
     
