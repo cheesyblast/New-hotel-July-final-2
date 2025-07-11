@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: Build a hotel management app with dashboard showing room status quick view, upcoming bookings, and checked-in customers with checkout functionality
+user_problem_statement: Build a comprehensive hotel management system with dashboard, rooms management, guest tracking, bookings, and expense/profit management
 
 backend:
   - task: "Hotel Management API - Room Management"
