@@ -1442,9 +1442,16 @@ const Navigation = () => {
           >
             Rooms
           </Link>
-          <a href="#" className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+          <Link 
+            to="/guests" 
+            className={`px-3 py-2 rounded-md text-sm font-medium ${
+              isActive('/guests') 
+                ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-600' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
             Guests
-          </a>
+          </Link>
           <Link 
             to="/bookings" 
             className={`px-3 py-2 rounded-md text-sm font-medium ${
