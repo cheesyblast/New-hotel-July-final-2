@@ -118,7 +118,7 @@ backend:
         comment: "Implemented complete room management API with CRUD operations, room status updates, and sample data initialization"
       - working: true
         agent: "testing"
-        comment: "PASSED - Room management API fully functional. All 10 sample rooms created correctly with proper status (Available, Occupied, Reserved). GET /api/rooms returns complete room data with guest information. Fixed BSON serialization issue with date objects by converting to datetime for MongoDB storage."
+        comment: "All 10 sample rooms created correctly, room status management working. Fixed BSON serialization issue with date objects."
 
   - task: "Hotel Management API - Booking Management"
     implemented: true
@@ -133,7 +133,7 @@ backend:
         comment: "Implemented booking management with upcoming bookings endpoint and full CRUD operations"
       - working: true
         agent: "testing"
-        comment: "PASSED - Booking management API fully functional. GET /api/bookings/upcoming returns 3 sample upcoming bookings with correct guest details, room assignments, and date filtering. All booking data properly structured and accessible."
+        comment: "3 upcoming bookings properly filtered and returned with complete data. Date handling fixed for MongoDB compatibility."
 
   - task: "Hotel Management API - Customer Management and Checkout"
     implemented: true
@@ -148,7 +148,7 @@ backend:
         comment: "Implemented customer management with checked-in customers endpoint and checkout functionality"
       - working: true
         agent: "testing"
-        comment: "PASSED - Customer management and checkout API fully functional. GET /api/customers/checked-in returns 2 sample checked-in customers with complete details. POST /api/checkout successfully removes customers from checked-in list and updates room status to Available. Error handling works correctly for invalid customer IDs."
+        comment: "2 checked-in customers managed correctly, checkout functionality removes customers and updates room status perfectly."
 
 frontend:
   - task: "Hotel Dashboard - Room Status Quick View"
