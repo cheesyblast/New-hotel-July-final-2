@@ -167,8 +167,23 @@ async def get_upcoming_bookings():
 @api_router.post("/bookings", response_model=Booking)
 async def create_booking(booking: BookingCreate):
     booking_dict = booking.dict()
+    
+    # Convert date strings to datetime for MongoDB compatibility
+    if isinstance(booking_dict.get('check_in_date'), str):
+        booking_dict['check_in_date'] = datetime.strptime(booking_dict['check_in_date'], '%Y-%m-%d').date()
+    if isinstance(booking_dict.get('check_out_date'), str):
+        booking_dict['check_out_date'] = datetime.strptime(booking_dict['check_out_date'], '%Y-%m-%d').date()
+    
     booking_obj = Booking(**booking_dict, status="Upcoming")
-    await db.bookings.insert_one(booking_obj.dict())
+    
+    # Convert date objects to datetime for MongoDB storage
+    booking_storage = booking_obj.dict()
+    if booking_storage.get('check_in_date'):
+        booking_storage['check_in_date'] = datetime.combine(booking_storage['check_in_date'], datetime.min.time())
+    if booking_storage.get('check_out_date'):
+        booking_storage['check_out_date'] = datetime.combine(booking_storage['check_out_date'], datetime.min.time())
+    
+    await db.bookings.insert_one(booking_storage)
     return booking_obj
 
 # Customer Management Routes
