@@ -50,28 +50,30 @@ class RoomCreate(BaseModel):
 class Booking(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     guest_name: str
-    guest_email: str
-    guest_phone: str
+    guest_email: str = ""
+    guest_phone: str = ""
     guest_id_passport: str = ""
     guest_country: str = ""
     room_number: str
     check_in_date: date
     check_out_date: date
     stay_type: str = "Night Stay"  # "Night Stay" or "Short Time"
+    booking_amount: float = 0.0  # Custom amount entered by user
     status: str  # Upcoming, Checked-in, Completed, Cancelled
     additional_notes: str = ""
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class BookingCreate(BaseModel):
     guest_name: str
-    guest_email: str
-    guest_phone: str
+    guest_email: str = ""
+    guest_phone: str = ""
     guest_id_passport: str = ""
     guest_country: str = ""
     room_number: str
     check_in_date: date
     check_out_date: Optional[date] = None
     stay_type: str = "Night Stay"
+    booking_amount: float = 0.0
     additional_notes: str = ""
 
 class BookingUpdate(BaseModel):
