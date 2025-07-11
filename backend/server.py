@@ -52,19 +52,30 @@ class Booking(BaseModel):
     guest_name: str
     guest_email: str
     guest_phone: str
+    guest_id_passport: str = ""
+    guest_country: str = ""
     room_number: str
     check_in_date: date
     check_out_date: date
     status: str  # Upcoming, Checked-in, Completed, Cancelled
+    additional_notes: str = ""
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class BookingCreate(BaseModel):
     guest_name: str
     guest_email: str
     guest_phone: str
+    guest_id_passport: str = ""
+    guest_country: str = ""
     room_number: str
     check_in_date: date
     check_out_date: date
+    additional_notes: str = ""
+
+class BookingUpdate(BaseModel):
+    check_in_date: Optional[date] = None
+    check_out_date: Optional[date] = None
+    additional_notes: Optional[str] = None
 
 class Customer(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
