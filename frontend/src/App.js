@@ -164,6 +164,32 @@ function App() {
     return roomCharges + additionalAmount - advanceAmount;
   };
 
+  const handleNewBooking = async () => {
+    try {
+      await axios.post(`${API}/bookings`, newBookingData);
+      
+      setShowNewBookingModal(false);
+      setNewBookingData({
+        guest_name: '',
+        guest_email: '',
+        guest_phone: '',
+        room_number: '',
+        check_in_date: '',
+        check_out_date: ''
+      });
+      
+      // Refresh bookings after creating new one
+      await fetchUpcomingBookings();
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      alert('Error creating booking. Please try again.');
+    }
+  };
+
+  const getAvailableRooms = () => {
+    return rooms.filter(room => room.status === 'Available');
+  };
+
   const getRoomStatusColor = (status) => {
     switch (status) {
       case 'Available':
