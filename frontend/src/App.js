@@ -108,7 +108,8 @@ const Dashboard = () => {
     try {
       await axios.post(`${API}/checkout`, {
         customer_id: selectedCustomer.id,
-        additional_amount: checkoutData.additional_amount
+        additional_amount: checkoutData.additional_amount,
+        discount_amount: checkoutData.discount_amount
       });
       
       setShowCheckoutModal(false);
