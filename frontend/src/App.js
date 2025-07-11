@@ -178,19 +178,29 @@ const Dashboard = () => {
 
   const handleNewBooking = async () => {
     try {
-      // Validate required fields
-      if (!newBookingData.guest_name || !newBookingData.guest_email || !newBookingData.guest_phone || 
-          !newBookingData.room_number || !newBookingData.check_in_date || !newBookingData.check_out_date) {
+      // Validate required fields - checkout date not required for short time
+      const requiredFields = ['guest_name', 'guest_email', 'guest_phone', 'room_number', 'check_in_date'];
+      const missingFields = requiredFields.filter(field => !newBookingData[field]);
+      
+      // For night stay, checkout date is required
+      if (newBookingData.stay_type === 'Night Stay' && !newBookingData.check_out_date) {
+        missingFields.push('check_out_date');
+      }
+      
+      if (missingFields.length > 0) {
         alert('Please fill in all required fields');
         return;
       }
 
-      // Ensure dates are in the correct format
+      // Prepare booking data
       const bookingData = {
-        ...newBookingData,
-        check_in_date: newBookingData.check_in_date,
-        check_out_date: newBookingData.check_out_date
+        ...newBookingData
       };
+
+      // For short time, don't send checkout date (backend will set it to same day)
+      if (newBookingData.stay_type === 'Short Time') {
+        delete bookingData.check_out_date;
+      }
 
       await axios.post(`${API}/bookings`, bookingData);
       
@@ -204,6 +214,7 @@ const Dashboard = () => {
         room_number: '',
         check_in_date: '',
         check_out_date: '',
+        stay_type: 'Night Stay',
         additional_notes: ''
       });
       
