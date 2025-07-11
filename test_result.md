@@ -111,14 +111,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Implemented complete room management API with CRUD operations, room status updates, and sample data initialization"
       - working: true
         agent: "testing"
         comment: "All 10 sample rooms created correctly, room status management working. Fixed BSON serialization issue with date objects."
+      - working: "NA"
+        agent: "main"
+        comment: "Enhanced room model with pricing, amenities, images. Added CRUD operations for room management."
 
   - task: "Hotel Management API - Booking Management"
     implemented: true
@@ -126,14 +126,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Implemented booking management with upcoming bookings endpoint and full CRUD operations"
       - working: true
         agent: "testing"
         comment: "3 upcoming bookings properly filtered and returned with complete data. Date handling fixed for MongoDB compatibility."
+      - working: "NA"
+        agent: "main"
+        comment: "Enhanced booking creation with proper date handling and validation. Fixed date conversion issues."
 
   - task: "Hotel Management API - Customer Management and Checkout"
     implemented: true
@@ -141,14 +141,50 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Implemented customer management with checked-in customers endpoint and checkout functionality"
       - working: true
         agent: "testing"
         comment: "2 checked-in customers managed correctly, checkout functionality removes customers and updates room status perfectly."
+      - working: "NA"
+        agent: "main"
+        comment: "Enhanced customer model with billing details, advance payments, and notes."
+
+  - task: "Hotel Management API - Guest Management"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented guest aggregation from bookings with statistics and booking history tracking."
+
+  - task: "Hotel Management API - Expense Management"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented complete expense tracking with categories, CRUD operations, and financial summary calculations."
+
+  - task: "Hotel Management API - Financial Summary"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented profit/loss calculations with revenue from bookings and expense tracking by category."
 
 frontend:
   - task: "Hotel Dashboard - Room Status Quick View"
