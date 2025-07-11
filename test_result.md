@@ -273,21 +273,22 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "1.0"
-  test_sequence: 1
+  version: "2.0"
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Hotel Dashboard - Room Status Quick View"
-    - "Hotel Dashboard - Upcoming Bookings Section"
-    - "Hotel Dashboard - Checked-in Customers with Checkout"
+    - "Hotel Management API - Guest Management"
+    - "Hotel Management API - Expense Management"
+    - "Hotel Management API - Financial Summary"
+    - "All Frontend Components"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Created complete hotel management system with backend API and frontend dashboard. All core features implemented including room status, upcoming bookings, and customer checkout functionality. Ready for comprehensive testing."
+    message: "Complete hotel management system implemented with dashboard, rooms, guests, bookings, and expense management. Enhanced with financial tracking and profit calculations. All major features implemented. Ready for comprehensive testing of new features and full system integration."
   - agent: "testing"
     message: "BACKEND TESTING COMPLETED - All 3 backend API tasks are now fully functional and tested. Fixed critical BSON serialization issue with date objects that was preventing sample data creation. All endpoints tested successfully: health check, sample data initialization, room management, booking management, customer management, and checkout functionality. Backend API is ready for frontend integration. Comprehensive test suite created at /app/backend_test.py for future regression testing."
