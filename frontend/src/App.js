@@ -198,9 +198,12 @@ const Dashboard = () => {
         guest_name: '',
         guest_email: '',
         guest_phone: '',
+        guest_id_passport: '',
+        guest_country: '',
         room_number: '',
         check_in_date: '',
-        check_out_date: ''
+        check_out_date: '',
+        additional_notes: ''
       });
       
       // Refresh bookings after creating new one
@@ -210,6 +213,35 @@ const Dashboard = () => {
       console.error('Error creating booking:', error);
       alert('Error creating booking. Please try again.');
     }
+  };
+
+  const handleEditBooking = async () => {
+    try {
+      await axios.put(`${API}/bookings/${selectedBooking.id}`, editBookingData);
+      
+      setShowEditBookingModal(false);
+      setSelectedBooking(null);
+      
+      // Refresh data after editing booking
+      await Promise.all([
+        fetchUpcomingBookings(),
+        fetchCheckedInCustomers()
+      ]);
+      alert('Booking updated successfully!');
+    } catch (error) {
+      console.error('Error updating booking:', error);
+      alert('Error updating booking. Please try again.');
+    }
+  };
+
+  const openEditBookingModal = (booking) => {
+    setSelectedBooking(booking);
+    setEditBookingData({
+      check_in_date: booking.check_in_date,
+      check_out_date: booking.check_out_date,
+      additional_notes: booking.additional_notes || ''
+    });
+    setShowEditBookingModal(true);
   };
 
   const getAvailableRooms = () => {
