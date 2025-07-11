@@ -90,6 +90,30 @@ class CheckinRequest(BaseModel):
     advance_amount: float = 0.0
     notes: str = ""
 
+class Expense(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    description: str
+    amount: float
+    category: str  # Food, Maintenance, Utilities, Staff, Marketing, etc.
+    expense_date: date
+    created_by: str = "Admin"
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ExpenseCreate(BaseModel):
+    description: str
+    amount: float
+    category: str
+    expense_date: date
+
+class FinancialSummary(BaseModel):
+    total_revenue: float
+    total_expenses: float
+    net_profit: float
+    revenue_breakdown: dict
+    expense_breakdown: dict
+    period_start: date
+    period_end: date
+
 # Room Management Routes
 @api_router.get("/rooms", response_model=List[Room])
 async def get_rooms():
