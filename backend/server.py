@@ -409,6 +409,97 @@ async def initialize_sample_data():
     
     return {"message": "Sample data initialized successfully"}
 
+# Guest Management Routes
+@api_router.get("/guests")
+async def get_guests():
+    # Get all bookings to extract guest information
+    bookings = await db.bookings.find().to_list(1000)
+    
+    # Create a dictionary to store unique guests with their booking history
+    guests_dict = {}
+    
+    for booking in bookings:
+        guest_email = booking.get('guest_email')
+        if guest_email:
+            if guest_email not in guests_dict:
+                # Convert datetime back to date for response
+                check_in_date = booking.get('check_in_date')
+                check_out_date = booking.get('check_out_date')
+                if isinstance(check_in_date, datetime):
+                    check_in_date = check_in_date.date()
+                if isinstance(check_out_date, datetime):
+                    check_out_date = check_out_date.date()
+                
+                guests_dict[guest_email] = {
+                    'id': guest_email,  # Using email as unique identifier
+                    'name': booking.get('guest_name'),
+                    'email': guest_email,
+                    'phone': booking.get('guest_phone'),
+                    'total_bookings': 0,
+                    'total_stays': 0,
+                    'last_stay': None,
+                    'upcoming_bookings': 0,
+                    'bookings': []
+                }
+            
+            # Add booking to guest's history
+            check_in_date = booking.get('check_in_date')
+            check_out_date = booking.get('check_out_date')
+            if isinstance(check_in_date, datetime):
+                check_in_date = check_in_date.date()
+            if isinstance(check_out_date, datetime):
+                check_out_date = check_out_date.date()
+            
+            booking_info = {
+                'id': booking.get('id'),
+                'room_number': booking.get('room_number'),
+                'check_in_date': check_in_date,
+                'check_out_date': check_out_date,
+                'status': booking.get('status'),
+                'created_at': booking.get('created_at')
+            }
+            
+            guests_dict[guest_email]['bookings'].append(booking_info)
+            guests_dict[guest_email]['total_bookings'] += 1
+            
+            # Update stats based on booking status
+            if booking.get('status') == 'Completed':
+                guests_dict[guest_email]['total_stays'] += 1
+                if not guests_dict[guest_email]['last_stay'] or check_out_date > guests_dict[guest_email]['last_stay']:
+                    guests_dict[guest_email]['last_stay'] = check_out_date
+            elif booking.get('status') == 'Upcoming':
+                guests_dict[guest_email]['upcoming_bookings'] += 1
+    
+    # Convert dictionary to list and sort by name
+    guests_list = list(guests_dict.values())
+    guests_list.sort(key=lambda x: x['name'])
+    
+    return guests_list
+
+@api_router.get("/guests/{guest_email}")
+async def get_guest_details(guest_email: str):
+    # Get all bookings for this guest
+    bookings = await db.bookings.find({"guest_email": guest_email}).to_list(1000)
+    
+    if not bookings:
+        raise HTTPException(status_code=404, detail="Guest not found")
+    
+    # Convert datetime back to date for response
+    for booking in bookings:
+        if isinstance(booking.get('check_in_date'), datetime):
+            booking['check_in_date'] = booking['check_in_date'].date()
+        if isinstance(booking.get('check_out_date'), datetime):
+            booking['check_out_date'] = booking['check_out_date'].date()
+    
+    guest_info = {
+        'name': bookings[0].get('guest_name'),
+        'email': guest_email,
+        'phone': bookings[0].get('guest_phone'),
+        'bookings': [Booking(**booking) for booking in bookings]
+    }
+    
+    return guest_info
+
 # Test route
 @api_router.get("/")
 async def root():
