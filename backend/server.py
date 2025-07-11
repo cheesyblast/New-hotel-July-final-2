@@ -145,6 +145,14 @@ async def update_room_status(room_id: str, status: str, guest_name: Optional[str
 @api_router.get("/bookings", response_model=List[Booking])
 async def get_bookings():
     bookings = await db.bookings.find().to_list(1000)
+    
+    # Convert datetime back to date for response
+    for booking in bookings:
+        if isinstance(booking.get('check_in_date'), datetime):
+            booking['check_in_date'] = booking['check_in_date'].date()
+        if isinstance(booking.get('check_out_date'), datetime):
+            booking['check_out_date'] = booking['check_out_date'].date()
+    
     return [Booking(**booking) for booking in bookings]
 
 @api_router.get("/bookings/upcoming", response_model=List[Booking])
