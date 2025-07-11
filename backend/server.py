@@ -192,7 +192,11 @@ async def initialize_sample_data():
     ]
     
     for booking in sample_bookings:
-        await db.bookings.insert_one(booking.dict())
+        booking_dict = booking.dict()
+        # Convert date objects to datetime for MongoDB compatibility
+        booking_dict['check_in_date'] = datetime.combine(booking_dict['check_in_date'], datetime.min.time())
+        booking_dict['check_out_date'] = datetime.combine(booking_dict['check_out_date'], datetime.min.time())
+        await db.bookings.insert_one(booking_dict)
     
     # Create sample checked-in customers
     sample_customers = [
