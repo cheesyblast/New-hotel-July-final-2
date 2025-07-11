@@ -168,7 +168,21 @@ const Dashboard = () => {
 
   const handleNewBooking = async () => {
     try {
-      await axios.post(`${API}/bookings`, newBookingData);
+      // Validate required fields
+      if (!newBookingData.guest_name || !newBookingData.guest_email || !newBookingData.guest_phone || 
+          !newBookingData.room_number || !newBookingData.check_in_date || !newBookingData.check_out_date) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      // Ensure dates are in the correct format
+      const bookingData = {
+        ...newBookingData,
+        check_in_date: newBookingData.check_in_date,
+        check_out_date: newBookingData.check_out_date
+      };
+
+      await axios.post(`${API}/bookings`, bookingData);
       
       setShowNewBookingModal(false);
       setNewBookingData({
@@ -182,6 +196,7 @@ const Dashboard = () => {
       
       // Refresh bookings after creating new one
       await fetchUpcomingBookings();
+      alert('Booking created successfully!');
     } catch (error) {
       console.error('Error creating booking:', error);
       alert('Error creating booking. Please try again.');
