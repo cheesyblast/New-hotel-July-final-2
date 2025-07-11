@@ -708,6 +708,455 @@ const Dashboard = () => {
       )}
     </div>
   );
+};
+
+// Rooms Component
+const Rooms = () => {
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddRoomModal, setShowAddRoomModal] = useState(false);
+  const [showEditRoomModal, setShowEditRoomModal] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [roomData, setRoomData] = useState({
+    room_number: '',
+    room_type: '',
+    price_per_night: 0,
+    max_occupancy: 2,
+    amenities: []
+  });
+
+  useEffect(() => {
+    fetchRooms();
+  }, []);
+
+  const fetchRooms = async () => {
+    try {
+      const response = await axios.get(`${API}/rooms`);
+      setRooms(response.data);
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddRoom = async () => {
+    try {
+      await axios.post(`${API}/rooms`, roomData);
+      setShowAddRoomModal(false);
+      setRoomData({
+        room_number: '',
+        room_type: '',
+        price_per_night: 0,
+        max_occupancy: 2,
+        amenities: []
+      });
+      await fetchRooms();
+    } catch (error) {
+      console.error('Error adding room:', error);
+      alert('Error adding room. Please try again.');
+    }
+  };
+
+  const handleEditRoom = async () => {
+    try {
+      await axios.put(`${API}/rooms/${selectedRoom.id}`, roomData);
+      setShowEditRoomModal(false);
+      setSelectedRoom(null);
+      await fetchRooms();
+    } catch (error) {
+      console.error('Error updating room:', error);
+      alert('Error updating room. Please try again.');
+    }
+  };
+
+  const handleDeleteRoom = async (roomId) => {
+    if (window.confirm('Are you sure you want to delete this room?')) {
+      try {
+        await axios.delete(`${API}/rooms/${roomId}`);
+        await fetchRooms();
+      } catch (error) {
+        console.error('Error deleting room:', error);
+        alert('Error deleting room. Please try again.');
+      }
+    }
+  };
+
+  const openEditModal = (room) => {
+    setSelectedRoom(room);
+    setRoomData({
+      room_number: room.room_number,
+      room_type: room.room_type,
+      price_per_night: room.price_per_night,
+      max_occupancy: room.max_occupancy,
+      amenities: room.amenities || []
+    });
+    setShowEditRoomModal(true);
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Available':
+        return 'bg-green-100 text-green-800';
+      case 'Occupied':
+        return 'bg-red-100 text-red-800';
+      case 'Reserved':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleAmenityChange = (amenity) => {
+    const currentAmenities = roomData.amenities || [];
+    if (currentAmenities.includes(amenity)) {
+      setRoomData({
+        ...roomData,
+        amenities: currentAmenities.filter(a => a !== amenity)
+      });
+    } else {
+      setRoomData({
+        ...roomData,
+        amenities: [...currentAmenities, amenity]
+      });
+    }
+  };
+
+  const commonAmenities = ["WiFi", "TV", "AC", "Mini Fridge", "Room Service", "Balcony", "Bathtub", "Safe"];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Rooms</h2>
+            <p className="text-gray-600">Manage hotel rooms and their details</p>
+          </div>
+          <button 
+            onClick={() => setShowAddRoomModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center space-x-2"
+          >
+            <span>Add Room</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {rooms.map((room) => (
+            <div key={room.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="relative">
+                <img 
+                  src={room.image_url} 
+                  alt={`Room ${room.room_number}`}
+                  className="w-full h-48 object-cover"
+                />
+                <div className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(room.status)}`}>
+                  {room.status}
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">Room {room.room_number}</h3>
+                <p className="text-sm text-gray-600 mb-2">{room.room_type}</p>
+                <p className="text-lg font-bold text-gray-900 mb-2">Rs.{room.price_per_night}/night</p>
+                <p className="text-sm text-gray-600 mb-2">Max Occupancy: {room.max_occupancy}</p>
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600">Amenities: {room.amenities?.join(', ')}</p>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => openEditModal(room)}
+                    className="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700 transition-colors"
+                  >
+                    Edit Room
+                  </button>
+                  <button
+                    onClick={() => handleDeleteRoom(room.id)}
+                    className="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition-colors"
+                  >
+                    Remove Room
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Add Room Modal */}
+        {showAddRoomModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <h3 className="text-lg font-semibold mb-4">Add New Room</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Number *</label>
+                  <input
+                    type="text"
+                    value={roomData.room_number}
+                    onChange={(e) => setRoomData({...roomData, room_number: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter room number"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Type *</label>
+                  <select
+                    value={roomData.room_type}
+                    onChange={(e) => setRoomData({...roomData, room_type: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select room type</option>
+                    <option value="Single">Single</option>
+                    <option value="Double">Double</option>
+                    <option value="Triple">Triple</option>
+                    <option value="Suite">Suite</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Price per Night *</label>
+                  <input
+                    type="number"
+                    value={roomData.price_per_night}
+                    onChange={(e) => setRoomData({...roomData, price_per_night: parseFloat(e.target.value) || 0})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter price"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Max Occupancy *</label>
+                  <input
+                    type="number"
+                    value={roomData.max_occupancy}
+                    onChange={(e) => setRoomData({...roomData, max_occupancy: parseInt(e.target.value) || 2})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    min="1"
+                    max="10"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Amenities</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {commonAmenities.map((amenity) => (
+                      <label key={amenity} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={roomData.amenities?.includes(amenity)}
+                          onChange={() => handleAmenityChange(amenity)}
+                          className="mr-2"
+                        />
+                        <span className="text-sm">{amenity}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setShowAddRoomModal(false)}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddRoom}
+                  disabled={!roomData.room_number || !roomData.room_type || !roomData.price_per_night}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+                >
+                  Add Room
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Room Modal */}
+        {showEditRoomModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <h3 className="text-lg font-semibold mb-4">Edit Room</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Number *</label>
+                  <input
+                    type="text"
+                    value={roomData.room_number}
+                    onChange={(e) => setRoomData({...roomData, room_number: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Type *</label>
+                  <select
+                    value={roomData.room_type}
+                    onChange={(e) => setRoomData({...roomData, room_type: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Single">Single</option>
+                    <option value="Double">Double</option>
+                    <option value="Triple">Triple</option>
+                    <option value="Suite">Suite</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Price per Night *</label>
+                  <input
+                    type="number"
+                    value={roomData.price_per_night}
+                    onChange={(e) => setRoomData({...roomData, price_per_night: parseFloat(e.target.value) || 0})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Max Occupancy *</label>
+                  <input
+                    type="number"
+                    value={roomData.max_occupancy}
+                    onChange={(e) => setRoomData({...roomData, max_occupancy: parseInt(e.target.value) || 2})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    min="1"
+                    max="10"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Amenities</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {commonAmenities.map((amenity) => (
+                      <label key={amenity} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={roomData.amenities?.includes(amenity)}
+                          onChange={() => handleAmenityChange(amenity)}
+                          className="mr-2"
+                        />
+                        <span className="text-sm">{amenity}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setShowEditRoomModal(false)}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEditRoom}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Update Room
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Navigation Component
+const Navigation = () => {
+  const location = useLocation();
+  
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+
+  return (
+    <nav className="bg-white shadow-sm border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex space-x-8">
+          <Link 
+            to="/" 
+            className={`px-3 py-2 rounded-md text-sm font-medium ${
+              isActive('/') 
+                ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-600' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Dashboard
+          </Link>
+          <Link 
+            to="/rooms" 
+            className={`px-3 py-2 rounded-md text-sm font-medium ${
+              isActive('/rooms') 
+                ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-600' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Rooms
+          </Link>
+          <a href="#" className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+            Guests
+          </a>
+          <a href="#" className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+            Bookings
+          </a>
+          <a href="#" className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+            Reports
+          </a>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+// Main App Component
+function App() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <BrowserRouter>
+        {/* Header */}
+        <header className="bg-white shadow-md border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <h1 className="text-xl font-bold text-gray-900 flex items-center">
+                    🏨 Hotel Management System
+                  </h1>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-500">Welcome, Admin</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Navigation */}
+        <Navigation />
+
+        {/* Main Content */}
+        <main>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/rooms" element={<Rooms />} />
+          </Routes>
+        </main>
+      </BrowserRouter>
+    </div>
+  );
 }
 
 export default App;
