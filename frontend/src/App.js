@@ -10,6 +10,21 @@ function App() {
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [checkedInCustomers, setCheckedInCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Modal states
+  const [showCheckinModal, setShowCheckinModal] = useState(false);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  
+  // Form states
+  const [checkinData, setCheckinData] = useState({
+    advance_amount: 0,
+    notes: ''
+  });
+  const [checkoutData, setCheckoutData] = useState({
+    additional_amount: 0
+  });
 
   useEffect(() => {
     initializeData();
