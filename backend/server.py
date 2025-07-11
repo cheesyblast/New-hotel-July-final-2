@@ -67,10 +67,21 @@ class Customer(BaseModel):
     current_room: str
     check_in_date: date
     check_out_date: date
+    advance_amount: float = 0.0
+    notes: str = ""
+    room_charges: float = 0.0
+    additional_charges: float = 0.0
+    total_amount: float = 0.0
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class CheckoutRequest(BaseModel):
     customer_id: str
+    additional_amount: float = 0.0
+
+class CheckinRequest(BaseModel):
+    booking_id: str
+    advance_amount: float = 0.0
+    notes: str = ""
 
 # Room Management Routes
 @api_router.get("/rooms", response_model=List[Room])
