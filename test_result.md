@@ -105,6 +105,18 @@
 user_problem_statement: Build a comprehensive hotel management system with dashboard, rooms management, guest tracking, bookings, and expense/profit management
 
 backend:
+  - task: "Financial Reports Integration with Daily Sales"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Updated all financial reporting endpoints to use actual daily sales data instead of booking-based calculations. This ensures payment collected aligns with daily sales and profit reports. Changes: Daily reports use daily_sales collection, Monthly reports use actual payments collected, Financial summary uses real transaction data with payment method breakdown."
+
   - task: "Enhanced Checkout with Payment Methods and Daily Sales"
     implemented: true
     working: true
