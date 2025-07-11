@@ -407,7 +407,7 @@ function App() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <button
-                            onClick={() => handleCheckout(customer.id)}
+                            onClick={() => handleCheckout(customer)}
                             className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
                           >
                             Checkout
