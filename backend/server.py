@@ -216,8 +216,14 @@ async def create_booking(booking: BookingCreate):
     # Convert date strings to datetime for MongoDB compatibility
     if isinstance(booking_dict.get('check_in_date'), str):
         booking_dict['check_in_date'] = datetime.strptime(booking_dict['check_in_date'], '%Y-%m-%d').date()
-    if isinstance(booking_dict.get('check_out_date'), str):
-        booking_dict['check_out_date'] = datetime.strptime(booking_dict['check_out_date'], '%Y-%m-%d').date()
+    
+    # Handle short time stays - set checkout date to same day if not provided or if short time
+    if booking_dict.get('stay_type') == 'Short Time' or not booking_dict.get('check_out_date'):
+        if booking_dict.get('stay_type') == 'Short Time':
+            booking_dict['check_out_date'] = booking_dict['check_in_date']
+    else:
+        if isinstance(booking_dict.get('check_out_date'), str):
+            booking_dict['check_out_date'] = datetime.strptime(booking_dict['check_out_date'], '%Y-%m-%d').date()
     
     booking_obj = Booking(**booking_dict, status="Upcoming")
     
