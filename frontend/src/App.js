@@ -1560,7 +1560,7 @@ const Expenses = () => {
               Net {financialSummary.net_profit >= 0 ? 'Profit' : 'Loss'}
             </h3>
             <p className={`text-3xl font-bold ${financialSummary.net_profit >= 0 ? 'text-blue-900' : 'text-orange-900'}`}>
-              ${Math.abs(financialSummary.net_profit).toFixed(2)}
+              LKR {Math.abs(financialSummary.net_profit).toFixed(2)}
             </p>
             <p className={`text-sm ${financialSummary.net_profit >= 0 ? 'text-blue-600' : 'text-orange-600'}`}>
               Current period
