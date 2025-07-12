@@ -1518,6 +1518,33 @@ const Expenses = () => {
     }
   };
 
+  const handleAddIncome = async () => {
+    try {
+      if (!incomeData.description || !incomeData.amount || !incomeData.category || !incomeData.income_date) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      await axios.post(`${API}/incomes`, incomeData);
+      
+      setShowAddIncomeModal(false);
+      setIncomeData({
+        description: '',
+        amount: 0,
+        category: '',
+        income_date: ''
+      });
+      
+      // Refresh data after adding income
+      await fetchIncomes();
+      await fetchFinancialSummary();
+      alert('Income added successfully!');
+    } catch (error) {
+      console.error('Error adding income:', error);
+      alert('Error adding income. Please try again.');
+    }
+  };
+
   const handleDeleteExpense = async (expenseId) => {
     if (window.confirm('Are you sure you want to delete this expense?')) {
       try {
