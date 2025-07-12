@@ -645,7 +645,7 @@ const Dashboard = () => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Discount Amount ($)
+                  Discount Amount (LKR)
                 </label>
                 <input
                   type="number"
