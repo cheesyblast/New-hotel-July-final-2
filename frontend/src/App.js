@@ -1552,7 +1552,7 @@ const Expenses = () => {
           </div>
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-red-800 mb-2">Total Expenses</h3>
-            <p className="text-3xl font-bold text-red-900">${financialSummary.total_expenses.toFixed(2)}</p>
+            <p className="text-3xl font-bold text-red-900">LKR {financialSummary.total_expenses.toFixed(2)}</p>
             <p className="text-sm text-red-600">Current period</p>
           </div>
           <div className={`${financialSummary.net_profit >= 0 ? 'bg-blue-50 border-blue-200' : 'bg-orange-50 border-orange-200'} border rounded-lg p-6`}>
