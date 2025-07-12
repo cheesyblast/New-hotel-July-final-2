@@ -1419,6 +1419,7 @@ const Reports = () => {
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
   const [incomes, setIncomes] = useState([]);
+  const [dailySales, setDailySales] = useState([]);
   const [financialSummary, setFinancialSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
