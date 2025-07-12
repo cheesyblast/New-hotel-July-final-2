@@ -1442,9 +1442,18 @@ const Expenses = () => {
     'Staff',
     'Food',
     'Marketing',
-    'Supplies',
-    'Insurance',
     'Other'
+  ];
+
+  const incomeCategories = [
+    'Restaurant',
+    'Laundry',
+    'Spa Services',
+    'Events',
+    'Conference Room',
+    'Parking',
+    'Internet Services',
+    'Other Services'
   ];
 
   useEffect(() => {
