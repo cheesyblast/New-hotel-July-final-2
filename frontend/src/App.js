@@ -1563,9 +1563,25 @@ const Expenses = () => {
         await axios.delete(`${API}/expenses/${expenseId}`);
         await fetchExpenses();
         await fetchFinancialSummary();
+        alert('Expense deleted successfully!');
       } catch (error) {
         console.error('Error deleting expense:', error);
         alert('Error deleting expense. Please try again.');
+      }
+    }
+  };
+
+  const handleDeleteIncome = async (id) => {
+    if (window.confirm('Are you sure you want to delete this income record?')) {
+      try {
+        await axios.delete(`${API}/incomes/${id}`);
+        await fetchIncomes();
+        await fetchDailySales();
+        await fetchFinancialSummary();
+        alert('Income record deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting income:', error);
+        alert('Error deleting income record. Please try again.');
       }
     }
   };
