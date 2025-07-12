@@ -1458,6 +1458,7 @@ const Expenses = () => {
 
   useEffect(() => {
     fetchExpenses();
+    fetchIncomes();
     fetchFinancialSummary();
   }, []);
 
@@ -1467,6 +1468,15 @@ const Expenses = () => {
       setExpenses(response.data);
     } catch (error) {
       console.error('Error fetching expenses:', error);
+    }
+  };
+
+  const fetchIncomes = async () => {
+    try {
+      const response = await axios.get(`${API}/incomes`);
+      setIncomes(response.data);
+    } catch (error) {
+      console.error('Error fetching incomes:', error);
     }
   };
 
