@@ -1418,14 +1418,22 @@ const Reports = () => {
 // Expenses Component
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
+  const [incomes, setIncomes] = useState([]);
   const [financialSummary, setFinancialSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
+  const [showAddIncomeModal, setShowAddIncomeModal] = useState(false);
   const [expenseData, setExpenseData] = useState({
     description: '',
     amount: 0,
     category: '',
     expense_date: ''
+  });
+  const [incomeData, setIncomeData] = useState({
+    description: '',
+    amount: 0,
+    category: '',
+    income_date: ''
   });
 
   const expenseCategories = [
