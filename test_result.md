@@ -105,6 +105,21 @@
 user_problem_statement: Build a comprehensive hotel management system with dashboard, rooms management, guest tracking, bookings, and expense/profit management
 
 backend:
+  - task: "Income Management and Enhanced Financial Summary Integration"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "PASSED - Comprehensive income management and enhanced financial summary integration testing completed successfully with 100% success rate (5/5 tests passed). ✅ Income CRUD Operations: All income management endpoints working perfectly - GET /api/incomes (retrieves all income records), POST /api/incomes (creates new income records with categories like Restaurant, Laundry, Spa Services, Events), DELETE /api/incomes/{id} (deletes income records). ✅ Enhanced Financial Summary: Total revenue calculation correctly integrates room revenue + additional income ($188,665 = $177,165 room revenue + $11,500 additional income). ✅ Income Breakdown: Financial summary provides detailed income breakdown by category (Restaurant: $3,700, Spa Services: $2,600, Events: $1,500, etc.). ✅ Daily Reports Integration: Daily reports correctly include additional income in total revenue calculations with proper separation of room revenue vs additional income. ✅ Income Date Filtering: Date filtering works correctly for financial summaries and reports. ✅ Complete Integration: End-to-end testing verified room sales through checkout + additional income sources = accurate total revenue in all financial reports. Payment method breakdown and expense calculations working correctly. The income management system is fully integrated with the financial reporting system."
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented comprehensive income management system with CRUD operations for additional income sources (Restaurant, Laundry, Spa Services, Events, etc.). Enhanced financial summary to include additional income in total revenue calculations. Updated daily and monthly reports to properly separate and include both room revenue and additional income."
+
   - task: "Financial Reports Integration with Daily Sales"
     implemented: true
     working: true
