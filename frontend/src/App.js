@@ -1547,7 +1547,7 @@ const Expenses = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-green-50 border border-green-200 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-green-800 mb-2">Total Revenue</h3>
-            <p className="text-3xl font-bold text-green-900">${financialSummary.total_revenue.toFixed(2)}</p>
+            <p className="text-3xl font-bold text-green-900">LKR {financialSummary.total_revenue.toFixed(2)}</p>
             <p className="text-sm text-green-600">Current period</p>
           </div>
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
