@@ -1019,7 +1019,40 @@ const Reports = () => {
 
   useEffect(() => {
     fetchReportsData();
+    fetchDailySales();
+    fetchIncomes();
   }, []);
+
+  const fetchDailySales = async () => {
+    try {
+      const response = await axios.get(`${API}/daily-sales`);
+      setDailySales(response.data);
+    } catch (error) {
+      console.error('Error fetching daily sales:', error);
+    }
+  };
+
+  const fetchIncomes = async () => {
+    try {
+      const response = await axios.get(`${API}/incomes`);
+      setIncomes(response.data);
+    } catch (error) {
+      console.error('Error fetching incomes:', error);
+    }
+  };
+
+  const handleDeleteIncome = async (id) => {
+    if (window.confirm('Are you sure you want to delete this income record?')) {
+      try {
+        await axios.delete(`${API}/incomes/${id}`);
+        await fetchIncomes();
+        alert('Income record deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting income:', error);
+        alert('Error deleting income record. Please try again.');
+      }
+    }
+  };
 
   const fetchReportsData = async () => {
     try {
