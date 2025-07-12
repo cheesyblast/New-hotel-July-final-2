@@ -849,6 +849,43 @@ async def delete_expense(expense_id: str):
         raise HTTPException(status_code=404, detail="Expense not found")
     return {"message": "Expense deleted successfully"}
 
+# Income Management Routes
+@api_router.get("/incomes", response_model=List[Income])
+async def get_incomes():
+    incomes = await db.incomes.find().sort("income_date", -1).to_list(1000)
+    
+    # Convert datetime back to date for response
+    for income in incomes:
+        if isinstance(income.get('income_date'), datetime):
+            income['income_date'] = income['income_date'].date()
+    
+    return [Income(**income) for income in incomes]
+
+@api_router.post("/incomes", response_model=Income)
+async def create_income(income: IncomeCreate):
+    income_dict = income.dict()
+    
+    # Convert date string to date object if needed
+    if isinstance(income_dict.get('income_date'), str):
+        income_dict['income_date'] = datetime.strptime(income_dict['income_date'], '%Y-%m-%d').date()
+    
+    income_obj = Income(**income_dict)
+    
+    # Convert date to datetime for MongoDB storage
+    income_storage = income_obj.dict()
+    if income_storage.get('income_date'):
+        income_storage['income_date'] = datetime.combine(income_storage['income_date'], datetime.min.time())
+    
+    await db.incomes.insert_one(income_storage)
+    return income_obj
+
+@api_router.delete("/incomes/{income_id}")
+async def delete_income(income_id: str):
+    result = await db.incomes.delete_one({"id": income_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Income not found")
+    return {"message": "Income deleted successfully"}
+
 @api_router.get("/daily-sales")
 async def get_daily_sales(start_date: Optional[str] = None, end_date: Optional[str] = None):
     # Default to current month if no dates provided
