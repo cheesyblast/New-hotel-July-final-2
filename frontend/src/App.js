@@ -616,7 +616,7 @@ const Dashboard = () => {
                   </div>
                   <div className="flex justify-between">
                     <span>Additional Charges:</span>
-                    <span>${parseFloat(checkoutData.additional_amount) || 0}</span>
+                    <span>LKR {parseFloat(checkoutData.additional_amount) || 0}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Discount:</span>
