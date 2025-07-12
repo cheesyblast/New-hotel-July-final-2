@@ -374,12 +374,8 @@ async def checkin_customer(checkin: CheckinRequest):
     if room["status"] != "Available":
         raise HTTPException(status_code=400, detail="Room is not available for check-in")
     
-    # Calculate room charges based on room type
-    room_charges = {
-        "Suite": 1000.0,
-        "Double": 500.0,
-        "Triple": 750.0
-    }.get(room["room_type"], 500.0)
+    # Use the booking amount as room charges (actual amount customer agreed to pay)
+    room_charges = booking.get("booking_amount", 500.0)
     
     # Create customer record
     customer = Customer(
