@@ -1587,13 +1587,22 @@ const Expenses = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Expenses & Profit Management</h2>
           <p className="text-gray-600">Track expenses and monitor financial performance</p>
         </div>
-        <button 
-          onClick={() => setShowAddExpenseModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center space-x-2"
-        >
-          <span>+</span>
-          <span>Add Expense</span>
-        </button>
+        <div className="flex space-x-3">
+          <button 
+            onClick={() => setShowAddIncomeModal(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 flex items-center space-x-2"
+          >
+            <span>+</span>
+            <span>Add Income</span>
+          </button>
+          <button 
+            onClick={() => setShowAddExpenseModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center space-x-2"
+          >
+            <span>+</span>
+            <span>Add Expense</span>
+          </button>
+        </div>
       </div>
 
       {/* Financial Summary Cards */}
