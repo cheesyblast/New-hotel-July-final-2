@@ -135,6 +135,21 @@ class ExpenseCreate(BaseModel):
     category: str
     expense_date: date
 
+class Income(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    description: str
+    amount: float
+    category: str  # Restaurant, Events, Laundry, Spa, Other Services, etc.
+    income_date: date
+    created_by: str = "Admin"
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class IncomeCreate(BaseModel):
+    description: str
+    amount: float
+    category: str
+    income_date: date
+
 class FinancialSummary(BaseModel):
     total_revenue: float
     total_expenses: float
