@@ -612,7 +612,7 @@ const Dashboard = () => {
                   </div>
                   <div className="flex justify-between">
                     <span>Advance Paid:</span>
-                    <span>-${selectedCustomer?.advance_amount || 0}</span>
+                    <span>-LKR {selectedCustomer?.advance_amount || 0}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Additional Charges:</span>
