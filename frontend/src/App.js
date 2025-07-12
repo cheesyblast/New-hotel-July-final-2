@@ -1548,6 +1548,7 @@ const Expenses = () => {
       
       // Refresh data after adding income
       await fetchIncomes();
+      await fetchDailySales();
       await fetchFinancialSummary();
       alert('Income added successfully!');
     } catch (error) {
