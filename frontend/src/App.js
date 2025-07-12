@@ -1612,8 +1612,8 @@ const Expenses = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Expenses & Profit Management</h2>
-          <p className="text-gray-600">Track expenses and monitor financial performance</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Inc & Exp Management</h2>
+          <p className="text-gray-600">Track income, expenses and monitor financial performance</p>
         </div>
         <div className="flex space-x-3">
           <button 
