@@ -2303,7 +2303,7 @@ const Rooms = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price per Night *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Price per Night (LKR) *</label>
                 <input
                   type="number"
                   value={roomData.price_per_night}
