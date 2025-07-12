@@ -625,7 +625,7 @@ const Dashboard = () => {
                   <hr className="my-2" />
                   <div className="flex justify-between font-semibold">
                     <span>Subtotal:</span>
-                    <span>${calculateTotal()}</span>
+                    <span>LKR {calculateTotal()}</span>
                   </div>
                 </div>
               </div>
