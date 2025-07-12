@@ -656,13 +656,25 @@ async def get_daily_reports(start_date: Optional[str] = None, end_date: Optional
         end_datetime = datetime.combine(current_date, datetime.max.time())
         
         # Calculate daily revenue from actual daily sales (payment collected)
-        daily_revenue = 0
+        room_revenue = 0
         daily_sales = await db.daily_sales.find({
             "date": {"$gte": start_datetime, "$lte": end_datetime}
         }).to_list(1000)
         
         for sale in daily_sales:
-            daily_revenue += sale.get("total_amount", 0)
+            room_revenue += sale.get("total_amount", 0)
+        
+        # Calculate additional income (non-room income)
+        additional_income = 0
+        incomes = await db.incomes.find({
+            "income_date": {"$gte": start_datetime, "$lte": end_datetime}
+        }).to_list(1000)
+        
+        for income in incomes:
+            additional_income += income.get("amount", 0)
+        
+        # Total daily revenue = room revenue + additional income
+        daily_revenue = room_revenue + additional_income
         
         # Calculate daily expenses
         daily_expenses = 0
@@ -678,6 +690,8 @@ async def get_daily_reports(start_date: Optional[str] = None, end_date: Optional
         daily_data.append({
             "date": current_date.strftime('%Y-%m-%d'),
             "revenue": daily_revenue,
+            "room_revenue": room_revenue,
+            "additional_income": additional_income,
             "expenses": daily_expenses,
             "profit": daily_profit,
             "sales_count": len(daily_sales),
