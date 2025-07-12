@@ -608,7 +608,7 @@ const Dashboard = () => {
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span>Room Charges:</span>
-                    <span>${selectedCustomer?.room_charges || 500}</span>
+                    <span>LKR {selectedCustomer?.room_charges || 500}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Advance Paid:</span>
