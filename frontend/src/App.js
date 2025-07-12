@@ -1014,6 +1014,8 @@ const Reports = () => {
   const [monthComparison, setMonthComparison] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedView, setSelectedView] = useState('daily'); // daily, monthly, comparison
+  const [dailySales, setDailySales] = useState([]);
+  const [incomes, setIncomes] = useState([]);
 
   useEffect(() => {
     fetchReportsData();
