@@ -679,7 +679,7 @@ const Dashboard = () => {
                     <p className={`text-3xl font-bold ${
                       calculateTotal() >= 0 ? 'text-green-800' : 'text-red-600'
                     }`}>
-                      ${Math.abs(calculateTotal()).toFixed(2)}
+                      LKR {Math.abs(calculateTotal()).toFixed(2)}
                     </p>
                     {calculateTotal() < 0 && (
                       <p className="text-xs text-red-600 mt-1">Refund Due to Customer</p>
