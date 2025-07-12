@@ -1610,7 +1610,7 @@ const Expenses = () => {
                       <div className="text-sm font-medium text-gray-900">{expense.description}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-bold text-red-600">${expense.amount.toFixed(2)}</div>
+                      <div className="text-sm font-bold text-red-600">LKR {expense.amount.toFixed(2)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getCategoryColor(expense.category)}`}>
