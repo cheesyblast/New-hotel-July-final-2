@@ -548,7 +548,7 @@ const Dashboard = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Advance Amount ($)
+                  Advance Amount (LKR)
                 </label>
                 <input
                   type="number"
