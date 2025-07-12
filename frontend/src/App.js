@@ -1460,6 +1460,7 @@ const Expenses = () => {
   useEffect(() => {
     fetchExpenses();
     fetchIncomes();
+    fetchDailySales();
     fetchFinancialSummary();
   }, []);
 
@@ -1478,6 +1479,15 @@ const Expenses = () => {
       setIncomes(response.data);
     } catch (error) {
       console.error('Error fetching incomes:', error);
+    }
+  };
+
+  const fetchDailySales = async () => {
+    try {
+      const response = await axios.get(`${API}/daily-sales`);
+      setDailySales(response.data);
+    } catch (error) {
+      console.error('Error fetching daily sales:', error);
     }
   };
 
