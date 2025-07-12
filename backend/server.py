@@ -932,14 +932,14 @@ async def get_financial_summary(start_date: Optional[str] = None, end_date: Opti
         "date": {"$gte": start_datetime, "$lte": end_datetime}
     }).to_list(1000)
     
-    total_revenue = 0
+    room_revenue = 0
     revenue_breakdown = {}
     payment_method_breakdown = {}
     
     for sale in daily_sales:
         # Total revenue from actual payments collected
         sale_amount = sale.get("total_amount", 0)
-        total_revenue += sale_amount
+        room_revenue += sale_amount
         
         # Revenue breakdown by room type (get room info for breakdown)
         room_number = sale.get("room_number", "")
@@ -956,6 +956,26 @@ async def get_financial_summary(start_date: Optional[str] = None, end_date: Opti
         if payment_method not in payment_method_breakdown:
             payment_method_breakdown[payment_method] = 0
         payment_method_breakdown[payment_method] += sale_amount
+    
+    # Calculate additional income (non-room income)
+    additional_incomes = await db.incomes.find({
+        "income_date": {"$gte": start_datetime, "$lte": end_datetime}
+    }).to_list(1000)
+    
+    additional_income_total = 0
+    income_breakdown = {}
+    
+    for income in additional_incomes:
+        amount = income.get("amount", 0)
+        additional_income_total += amount
+        
+        category = income.get("category", "Other")
+        if category not in income_breakdown:
+            income_breakdown[category] = 0
+        income_breakdown[category] += amount
+    
+    # Total revenue = room revenue + additional income
+    total_revenue = room_revenue + additional_income_total
     
     # Calculate expenses
     expenses = await db.expenses.find({
@@ -978,9 +998,12 @@ async def get_financial_summary(start_date: Optional[str] = None, end_date: Opti
     
     return {
         "total_revenue": total_revenue,
+        "room_revenue": room_revenue,
+        "additional_income": additional_income_total,
         "total_expenses": total_expenses,
         "net_profit": net_profit,
         "revenue_breakdown": revenue_breakdown,
+        "income_breakdown": income_breakdown,
         "expense_breakdown": expense_breakdown,
         "payment_method_breakdown": payment_method_breakdown,
         "period_start": start_date,
