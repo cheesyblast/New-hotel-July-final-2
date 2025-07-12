@@ -2245,7 +2245,7 @@ const Rooms = () => {
             <div className="p-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-1">Room {room.room_number}</h3>
               <p className="text-sm text-gray-600 mb-2">{room.room_type}</p>
-              <p className="text-lg font-bold text-gray-900 mb-2">Rs.{room.price_per_night}/night</p>
+              <p className="text-lg font-bold text-gray-900 mb-2">LKR {room.price_per_night}/night</p>
               <p className="text-sm text-gray-600 mb-2">Max Occupancy: {room.max_occupancy}</p>
               <div className="mb-4">
                 <p className="text-sm text-gray-600">Amenities: {room.amenities?.join(', ')}</p>
