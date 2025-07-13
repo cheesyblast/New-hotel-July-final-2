@@ -2417,6 +2417,59 @@ const Guests = () => {
           </div>
         </div>
       )}
+      {/* Download Modal */}
+      {showDownloadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Download Guest Data</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date *
+                </label>
+                <input
+                  type="date"
+                  value={downloadDateRange.startDate}
+                  onChange={(e) => setDownloadDateRange({...downloadDateRange, startDate: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date *
+                </label>
+                <input
+                  type="date"
+                  value={downloadDateRange.endDate}
+                  onChange={(e) => setDownloadDateRange({...downloadDateRange, endDate: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+
+              <div className="text-sm text-gray-600">
+                <p>This will download guest data for guests who had their last stay within the selected date range.</p>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowDownloadModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDownloadGuests}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+              >
+                Download CSV
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
