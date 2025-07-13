@@ -2251,7 +2251,7 @@ const Guests = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         {filteredGuests.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
-            No guests found
+            {searchQuery ? `No guests found matching "${searchQuery}"` : 'No guests found'}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -2285,7 +2285,7 @@ const Guests = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {guests.map((guest) => (
+                {filteredGuests.map((guest) => (
                   <tr key={guest.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{guest.name}</div>
