@@ -1807,41 +1807,44 @@ const Expenses = () => {
         <div className="mb-6">
           <h4 className="text-md font-medium text-green-800 mb-3">Room Bookings</h4>
           {dailySales && dailySales.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-green-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Guest</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Room</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Payment Method</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Amount</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {dailySales.slice(0, 10).map((sale, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {new Date(sale.date).toLocaleDateString()}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{sale.customer_name}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{sale.room_number}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{sale.payment_method}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-bold text-green-600">LKR {sale.total_amount.toFixed(2)}</div>
-                      </td>
+            <div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-green-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Guest</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Room</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Payment Method</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Amount</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {getPaginatedData(dailySales, roomBookingsPage).map((sale, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {new Date(sale.date).toLocaleDateString()}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{sale.customer_name}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{sale.room_number}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{sale.payment_method}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-bold text-green-600">LKR {sale.total_amount.toFixed(2)}</div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {renderPagination(dailySales, roomBookingsPage, setRoomBookingsPage)}
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
