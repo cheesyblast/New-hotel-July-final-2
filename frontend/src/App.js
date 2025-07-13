@@ -2100,10 +2100,25 @@ const Guests = () => {
     fetchGuests();
   }, []);
 
+  useEffect(() => {
+    // Filter guests based on search query
+    if (searchQuery.trim() === '') {
+      setFilteredGuests(guests);
+    } else {
+      const filtered = guests.filter(guest =>
+        guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        guest.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        guest.phone.includes(searchQuery)
+      );
+      setFilteredGuests(filtered);
+    }
+  }, [guests, searchQuery]);
+
   const fetchGuests = async () => {
     try {
       const response = await axios.get(`${API}/guests`);
       setGuests(response.data);
+      setFilteredGuests(response.data);
     } catch (error) {
       console.error('Error fetching guests:', error);
     } finally {
