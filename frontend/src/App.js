@@ -2151,6 +2151,58 @@ const Guests = () => {
     }
   };
 
+  const handleDownloadGuests = async () => {
+    try {
+      if (!downloadDateRange.startDate || !downloadDateRange.endDate) {
+        alert('Please select both start and end dates');
+        return;
+      }
+
+      // Filter guests based on date range (you can modify this logic based on your needs)
+      const filteredData = guests.filter(guest => {
+        if (guest.last_stay) {
+          const lastStayDate = new Date(guest.last_stay);
+          const startDate = new Date(downloadDateRange.startDate);
+          const endDate = new Date(downloadDateRange.endDate);
+          return lastStayDate >= startDate && lastStayDate <= endDate;
+        }
+        return false;
+      });
+
+      // Create CSV content
+      const headers = ['Name', 'Email', 'Phone', 'Total Bookings', 'Completed Stays', 'Upcoming Bookings', 'Last Stay'];
+      const csvContent = [
+        headers.join(','),
+        ...filteredData.map(guest => [
+          `"${guest.name}"`,
+          `"${guest.email}"`,
+          `"${guest.phone}"`,
+          guest.total_bookings,
+          guest.total_stays,
+          guest.upcoming_bookings,
+          `"${guest.last_stay || 'Never'}"`
+        ].join(','))
+      ].join('\n');
+
+      // Create and download file
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `guests_${downloadDateRange.startDate}_to_${downloadDateRange.endDate}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      setShowDownloadModal(false);
+      alert(`Downloaded ${filteredData.length} guest records`);
+    } catch (error) {
+      console.error('Error downloading guest data:', error);
+      alert('Error downloading guest data. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
