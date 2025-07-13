@@ -1424,6 +1424,12 @@ const Expenses = () => {
   const [loading, setLoading] = useState(true);
   const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
   const [showAddIncomeModal, setShowAddIncomeModal] = useState(false);
+  
+  // Pagination state
+  const [roomBookingsPage, setRoomBookingsPage] = useState(1);
+  const [additionalIncomePage, setAdditionalIncomePage] = useState(1);
+  const itemsPerPage = 10;
+  
   const [expenseData, setExpenseData] = useState({
     description: '',
     amount: 0,
