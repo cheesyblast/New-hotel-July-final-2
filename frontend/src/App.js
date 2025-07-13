@@ -2218,10 +2218,38 @@ const Guests = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Guests</h2>
           <p className="text-gray-600">Manage guest information and booking history</p>
         </div>
+        <button
+          onClick={() => setShowDownloadModal(true)}
+          className="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 flex items-center space-x-2"
+        >
+          <span>📥</span>
+          <span>Download Guest Data</span>
+        </button>
+      </div>
+
+      {/* Search Section */}
+      <div className="mb-6">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search guests by name, email, or phone..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span className="text-gray-400">🔍</span>
+          </div>
+        </div>
+        {searchQuery && (
+          <p className="mt-2 text-sm text-gray-600">
+            Showing {filteredGuests.length} result(s) for "{searchQuery}"
+          </p>
+        )}
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        {guests.length === 0 ? (
+        {filteredGuests.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
             No guests found
           </div>
