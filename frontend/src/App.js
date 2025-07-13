@@ -2085,9 +2085,16 @@ const Expenses = () => {
 // Guests Component
 const Guests = () => {
   const [guests, setGuests] = useState([]);
+  const [filteredGuests, setFilteredGuests] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [showGuestDetails, setShowGuestDetails] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [downloadDateRange, setDownloadDateRange] = useState({
+    startDate: '',
+    endDate: ''
+  });
 
   useEffect(() => {
     fetchGuests();
